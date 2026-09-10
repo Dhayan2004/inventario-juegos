@@ -1,0 +1,54 @@
+# security.yml — Seguridad como gate remoto (A2 · cierra el gate CI de A3)
+#
+# Promueve el arsenal de seguridad runtime-local de S1 (security-scan/R15, threat-db, el-guardian) a
+# un gate REMOTO independiente. Es la versión CI fail-closed del `pre-commit` R15. No reemplaza a
+# el-guardian/temple — los complementa con un árbitro que el agente no puede falsificar.
+# Fuente: docs/07 Punto 4 §3.a / §3.d.
+
+name: security
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'   # lunes 06:00 UTC (barrido semanal)
+
+permissions:
+  contents: read
+  security-events: write   # para subir resultados SAST a la pestaña Security
+
+jobs:
+  secrets:
+    name: Secrets (gitleaks) — fail-closed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: 'false'
+      # gitleaks sale ≠0 si encuentra secrets → el job falla (fail-closed, igual que R15 en pre-commit).
+
+  deps:
+    name: Dependencies (npm audit) — fail-closed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: npm audit --audit-level=high
+
+  sast:
+    name: SAST (CodeQL) — warning al inicio, required después
+    runs-on: ubuntu-latest
+    continue-on-error: true   # F-P4.5: warning al inicio; quitar continue-on-error para hacerlo required
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript-typescript }
+      - uses: github/codeql-action/analyze@v3
+
+  # temple-ci (opcional, fase 2): corre /temple security headless contra threat-db.yaml y publica el
+  # Audit Score como check. Requiere runner con la skill project-auditor + acceso a Supabase advisors.
+  # Se deja documentado; se activa cuando el harness corre headless en CI (futuro).

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://forja.dev/schemas/payment-page-scripts.json",
+  "_comment": "PCI DSS 4.0.1 §6.4.3 — inventario AUTORIZADO de scripts que cargan en páginas de pago (G6, D-038). Todo <script src> / next/script en app/(billing)/** debe estar aquí con purpose + approved_by; los loaders del PSP van sin SRI (versionless por diseño) y se justifican. Revisar en cada cambio de checkout. Fuente del formato: PagoKit 0.2.2 fragments/compliance/pci_script_inventory.md (MIT).",
+  "scripts": [
+    {
+      "src": "https://sdk.mercadopago.com/js/v2",
+      "purpose": "PSP loader (Bricks / Checkout Pro): tokeniza la tarjeta en un iframe cross-origin; ningún PAN toca nuestro origen (SAQ A).",
+      "approved_by": "{{ SECURITY_OWNER_EMAIL }}",
+      "approved_at": "{{ TODAY }}",
+      "integrity": null,
+      "integrity_exempt_reason": "pci.loader_exempt_from_sri — versionless por diseño; un hash fijo rompe el checkout en vivo."
+    },
+    {
+      "src": "https://js.stripe.com/v3",
+      "purpose": "PSP loader (Stripe Elements / Checkout): tokenización en iframe; sin PAN en nuestro origen (SAQ A).",
+      "approved_by": "{{ SECURITY_OWNER_EMAIL }}",
+      "approved_at": "{{ TODAY }}",
+      "integrity": null,
+      "integrity_exempt_reason": "pci.loader_exempt_from_sri — versionless por diseño."
+    }
+  ],
+  "pages": ["src/app/(billing)/pricing/page.tsx", "src/app/(billing)/checkout/page.tsx"],
+  "reviewed_at": "{{ TODAY }}",
+  "reviewed_by": "{{ SECURITY_OWNER_EMAIL }}"
+}

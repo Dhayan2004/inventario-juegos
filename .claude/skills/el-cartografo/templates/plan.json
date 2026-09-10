@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "schema_version": "2.0.0",
+    "generated_by": "el-cartografo",
+    "source_spec": "SPEC.md",
+    "source_ontology": "ONTOLOGY.md"
+  },
+  "project": {
+    "name": "Cliente — Proyecto",
+    "client": "Cliente S.A.",
+    "slug": "cliente",
+    "kickoff": "",
+    "currentStage": { "phaseId": "", "subphaseId": "", "storyId": "" },
+    "tenantId": "",
+    "lastUpdate": ""
+  },
+  "tools": {},
+  "statusLabels": {
+    "done":        { "label": "Completado",  "color": "#10b981", "icon": "✅" },
+    "in_progress": { "label": "En progreso", "color": "#fbbf24", "icon": "🟡" },
+    "pending":     { "label": "Pendiente",   "color": "#6b7280", "icon": "⏳" },
+    "blocked":     { "label": "Bloqueado",   "color": "#ef4444", "icon": "🔴" }
+  },
+  "modules": [],
+  "phases": [
+    {
+      "id": "F1",
+      "number": 1,
+      "name": "Fase inicial",
+      "color": "#3b82f6",
+      "plannedStart": "",
+      "plannedEnd": "",
+      "deliverables": [],
+      "subphases": [
+        {
+          "id": "F1-S1",
+          "name": "Subfase inicial",
+          "plannedStart": "",
+          "plannedEnd": "",
+          "stories": [
+            {
+              "id": "F1-S1-US01",
+              "as": "usuario",
+              "want": "describir la primera capacidad",
+              "soThat": "obtener el primer valor",
+              "status": "pending",
+              "modules": [],
+              "featureRefs": [],
+              "acceptance": [],
+              "plannedStart": "",
+              "plannedEnd": "",
+              "blocker": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "blockers": [],
+  "decisions": [],
+  "diagrams": []
+}

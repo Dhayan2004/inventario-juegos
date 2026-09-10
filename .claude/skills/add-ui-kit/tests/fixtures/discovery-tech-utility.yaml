@@ -1,0 +1,104 @@
+# Dry-run fixture: Discovery output for preset TECH UTILITY
+# Produced by add-ui-kit Mode FRESH simulation.
+# Consumed by tests/dry-run.sh to validate the 4-output pipeline end-to-end.
+
+mode: FRESH
+baseline_preset: tech_utility
+
+identity:
+  name: "Carlos Domínguez"
+  product: "Forge"
+  tagline: "El código mediocre se genera. El gran software se forja."
+  positioning: "El puente entre el vibe coding caótico y el software bien construido."
+  category: "AI-assisted software craft system"
+  audience:
+    - "founders"
+    - "indie hackers"
+    - "dev leads"
+    - "B2B tech-ready LATAM"
+
+archetype:
+  primary: Creator
+  secondary: Sage
+  controlled_tension: Outlaw
+  shadow_to_avoid: ["Magician", "Hero"]
+  ui_translation: "craft, precision, visible structure, no spectacle"
+  copy_translation: "diagnosis, oficio, clarity, no hype"
+  allowed_behaviors:
+    - "Mostrar herramientas y proceso, no solo resultados"
+    - "Confrontar el status quo de vibe coding cuando agrega valor (Outlaw controlado)"
+    - "Usar mono fonts para anclar autoridad técnica"
+  forbidden_behaviors:
+    - "Vender 'AI magic' como cualidad principal"
+    - "Promesas de velocidad sin oficio"
+    - "Estética edgy sin propósito"
+
+posture:
+  density: 4
+  expression: 2
+  geometry: 4
+  warmth: 2
+  editoriality: 1
+  materiality: 1
+
+voice:
+  tone_axes:
+    directness: 4
+    warmth: 3
+    technicality: 4
+    provocation: 2
+    hype: 1
+  principles:
+    - "Diagnóstico, no crítica"
+    - "Artesano, no técnico"
+    - "Confianza serena"
+    - "Build in public"
+    - "Proceso antes que polish"
+  vibe: "Un colega afilado que ya descifró algo y te enseña el atajo"
+  safe_words:
+    - "forjar"
+    - "yunque"
+    - "fragua"
+    - "Blueprint"
+    - "build in public"
+    - "craft"
+    - "intencional"
+  avoid_words: []  # solo baseline 23
+  cta_style: "Directo, no pushy"
+  hooks:
+    - "El código mediocre se genera. El gran software se forja."
+    - "Planifica primero. Construye después. Forja siempre."
+    - "No vibe coding. Craft coding."
+  cta_examples:
+    - "Si te sirve, compártelo."
+    - "Pruébalo en tu próximo proyecto y avísame."
+    - "Forge it."
+
+tokens_seed:
+  primary_color: "#FF6B35"
+  font_family: null  # use preset default (Geist + Geist Mono)
+  radius_steps: 3
+  spacing_unit: 4
+
+anti_slop:
+  forbidden_patterns_additions:
+    - "robot icon en círculo gradient como hero visual"
+    - "AI-magic copy"
+
+motion:
+  energy: precise
+  elasticity: snap_not_bounce
+  directionality: mechanical
+  sequencing: subtle_stagger
+  distance: short
+  restraint: high
+  durations:
+    instant: 80
+    fast: 140
+    base: 220
+    slow: 320
+
+validation:
+  max_fonts: 2
+  max_radius_values: 3
+  max_primary_color_usage_percent: 18

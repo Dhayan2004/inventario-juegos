@@ -1,0 +1,33 @@
+// next.config.mjs PATCH para Capacitor Mode B
+//
+// Aplicar manualmente al next.config.mjs existente del proyecto target.
+// NO sobreescribir config — merge con cuidado.
+//
+// Cita: [docs:nextjs] · [docs:capacitor]
+
+const capacitorPatch = {
+  // CRITICAL para Capacitor: static export
+  output: 'export',
+
+  // Required para static export con next/image
+  images: {
+    unoptimized: true,
+  },
+
+  // Evita 404 en Capacitor (no rewrite engine)
+  trailingSlash: true,
+
+  // Disable server-side features incompatible con static export
+  // - NO API routes (mover a backend separado: Supabase Edge Functions, Vercel Functions, custom backend)
+  // - NO server actions
+  // - NO middleware
+  // - NO ISR / dynamic SSR
+};
+
+// IMPORTANTE: si el proyecto usa API routes (Mode A las tiene en /api/push/),
+// hay 2 opciones:
+// 1. Mover API routes a backend separado (recomendado para Capacitor)
+// 2. NO usar Capacitor — quedarse con PWA Mode A puro
+//
+// Capacitor con API routes en mismo proyecto NO funciona porque static export
+// no genera server runtime.

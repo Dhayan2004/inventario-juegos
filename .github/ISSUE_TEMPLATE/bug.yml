@@ -1,0 +1,61 @@
+# bug.yml — Issue form de bug estándar (S2 · Equipos GitHub-native).
+#
+# Un bug NO es una feature de build: no toca feature_list.json ni el state machine. Es un reporte humano
+# que, una vez triado, puede convertirse en una feature vía /capataz (que sí escribe feature_list.json).
+name: Bug report
+description: Reportá un comportamiento incorrecto, error o regresión.
+title: "[bug] <resumen corto>"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Gracias por reportar. Cuanto más concreto el repro, más rápido el fix. Para vulnerabilidades de
+        seguridad NO uses este formulario público — usá un Security Advisory privado.
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: Qué pasó
+      description: El comportamiento incorrecto que observaste. Incluí el error exacto si lo hay.
+      placeholder: Al aceptar una invitación con un email distinto, la app me deja entrar igual.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Qué esperabas
+      description: El comportamiento correcto que debería haber ocurrido.
+      placeholder: accept_invitation debería rebotar si el email del JWT no coincide con la invitación.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Pasos para reproducir
+      description: Lista numerada, determinista, desde un estado conocido.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Entorno
+      description: Versiones y contexto (OS, navegador, Node, rama/commit, deploy local o Vercel).
+      value: |
+        - OS:
+        - Navegador:
+        - Node:
+        - Commit / rama:
+        - Entorno: (local | Vercel | Coolify)
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Logs / capturas (opcional)
+      description: Stack traces, capturas o cualquier evidencia adicional.
+    validations:
+      required: false

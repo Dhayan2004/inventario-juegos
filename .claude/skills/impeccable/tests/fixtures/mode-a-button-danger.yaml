@@ -1,0 +1,15 @@
+# Mode A fixture: KNOWN component generation
+# Input: button.danger from TECH UTILITY brand.json
+# Expected output: src/shared/components/ui/Button/Button.tsx with all 4 variants
+
+mode: A
+component: button
+variant: danger    # the trigger — but Mode A generates the WHOLE component file with all variants
+brand_json_path: .claude/skills/add-ui-kit/tests/expected/brand/brand.json
+voice_json_path: .claude/skills/add-ui-kit/tests/expected/brand/voice.json
+
+target_path: src/shared/components/ui/Button/Button.tsx
+
+extras:
+  use_client: true   # because handlers + isLoading state may apply
+  with_states: true

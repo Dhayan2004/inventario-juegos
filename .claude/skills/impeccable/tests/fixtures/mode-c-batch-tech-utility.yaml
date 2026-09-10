@@ -1,0 +1,27 @@
+# Mode C fixture: BATCH init core component set
+# Input: brand.json (TECH UTILITY) → generate ALL component_rules.variants
+# Expected outputs in src/shared/components/ui/
+
+mode: C
+brand_json_path: .claude/skills/add-ui-kit/tests/expected/brand/brand.json
+voice_json_path: .claude/skills/add-ui-kit/tests/expected/brand/voice.json
+target_dir: src/shared/components/ui
+
+scope: all   # all 19 (component, variant) pairs from TECH UTILITY brand.json
+
+expected_files:
+  - Button/Button.tsx       # 4 variants in single cva
+  - Card/Card.tsx           # 4 variants in single cva + composition primitives
+  - Form/Input.tsx          # text + search variants
+  - Form/Textarea.tsx       # 1 variant (only)
+  - Form/Select.tsx         # 1 variant (only)
+  - Modal/Modal.tsx         # 3 variants in single cva + ConfirmModal wrapper
+  - Navigation/Sidebar.tsx
+  - Navigation/Topbar.tsx
+  - Navigation/Tabs.tsx
+  - Navigation/Breadcrumb.tsx
+  - types.ts                # shared utility types
+  - index.ts                # barrel re-export
+
+with_barrel: true
+with_types: true

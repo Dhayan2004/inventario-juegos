@@ -1,0 +1,93 @@
+{
+  "$schema_source": "[memory:references#R-005] v1.1.0 sección 9.2",
+  "$generated_by": "add-ui-kit (FRESH mode, tech_utility preset baseline)",
+  "$generated_at": "2026-05-08T15:30:00Z",
+  "schema_version": "1.1.0",
+  "voice": {
+    "name": "Forge",
+    "language": "es-419",
+    "tone_axes": {
+      "directness": 4,
+      "warmth": 3,
+      "technicality": 4,
+      "provocation": 2,
+      "hype": 1
+    },
+    "principles": [
+      "Diagnóstico, no crítica",
+      "Artesano, no técnico",
+      "Confianza serena",
+      "Build in public",
+      "Proceso antes que polish"
+    ],
+    "vibe": "Un colega afilado que ya descifró algo y te enseña el atajo",
+    "audience": "founders + indie hackers + dev leads + B2B tech-ready LATAM",
+    "code_switching": {
+      "allowed": ["Claude Code", "MCP", "vibe coding", "ship", "deploy", "Blueprint", "prompt", "merge"],
+      "rule": "Anglicismos técnicos sin traducir cuando son parte natural del oficio"
+    },
+    "safe_words": [
+      "forjar",
+      "yunque",
+      "fragua",
+      "Blueprint",
+      "build in public",
+      "craft",
+      "intencional"
+    ],
+    "avoid_words": [
+      "revolutionary",
+      "revolucionario",
+      "cutting-edge",
+      "AI-powered como cualidad principal",
+      "best-in-class",
+      "leverage",
+      "synergy",
+      "disrupt",
+      "ecosystem como relleno",
+      "unlock your potential",
+      "Act now",
+      "Limited time",
+      "barato",
+      "fácil",
+      "increíble",
+      "seamless experience",
+      "effortless",
+      "supercharge your workflow",
+      "game-changing",
+      "next-generation",
+      "transform your business",
+      "all-in-one platform",
+      "scale with confidence"
+    ],
+    "sentence_rules": {
+      "prefer": [
+        "Frases cortas",
+        "Verbos concretos",
+        "Diagnóstico antes que promesa",
+        "Metáforas de oficio cuando ayuden"
+      ],
+      "avoid": [
+        "Superlativos vacíos",
+        "Promesas absolutas",
+        "Corporate SaaS filler",
+        "Hype de IA mágica"
+      ]
+    },
+    "hooks": [
+      "El código mediocre se genera. El gran software se forja.",
+      "Planifica primero. Construye después. Forja siempre.",
+      "No vibe coding. Craft coding."
+    ],
+    "cta_style": "Directo, no pushy",
+    "cta_examples": [
+      "Si te sirve, compártelo.",
+      "Pruébalo en tu próximo proyecto y avísame.",
+      "Forge it."
+    ],
+    "pacing": {
+      "words_per_minute": 165,
+      "pause_after_hook_ms": 400
+    }
+  }
+}

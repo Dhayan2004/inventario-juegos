@@ -1,0 +1,174 @@
+{
+  "$schema_source": "[memory:references#R-005] v1.1.0",
+  "$generated_by": "add-ui-kit (FRESH mode, tech_utility preset baseline)",
+  "$generated_at": "2026-05-08T15:30:00Z",
+  "schema_version": "1.1.0",
+  "brand": {
+    "name": "Carlos Domínguez",
+    "product": "Forge",
+    "tagline": "El código mediocre se genera. El gran software se forja.",
+    "positioning": "El puente entre el vibe coding caótico y el software bien construido.",
+    "category": "AI-assisted software craft system",
+    "audience": ["founders", "indie hackers", "dev leads", "B2B tech-ready LATAM"]
+  },
+  "archetype": {
+    "primary": "Creator",
+    "secondary": "Sage",
+    "controlled_tension": "Outlaw",
+    "shadow_to_avoid": ["Magician", "Hero"],
+    "ui_translation": "craft, precision, visible structure, no spectacle",
+    "copy_translation": "diagnosis, oficio, clarity, no hype",
+    "allowed_behaviors": [
+      "Mostrar herramientas y proceso, no solo resultados",
+      "Confrontar el status quo de vibe coding cuando agrega valor (Outlaw controlado)",
+      "Usar mono fonts para anclar autoridad técnica"
+    ],
+    "forbidden_behaviors": [
+      "Vender 'AI magic' como cualidad principal",
+      "Promesas de velocidad sin oficio",
+      "Estética edgy sin propósito"
+    ]
+  },
+  "visual_posture": {
+    "density": 4,
+    "expression": 2,
+    "geometry": 4,
+    "warmth": 2,
+    "editoriality": 1,
+    "materiality": 1
+  },
+  "tokens": {
+    "colors": {
+      "primary": "#FF6B35",
+      "primary_deep": "#B23F12",
+      "primary_accessible_on_dark": "#FF8C5C",
+      "accent": "#FFB627",
+      "surface": "#0F0F10",
+      "surface_elevated": "#18181B",
+      "surface_higher": "#27272A",
+      "border": "#3F3F46",
+      "text": "#FAFAFA",
+      "text_muted": "#A1A1AA",
+      "text_subtle": "#71717A",
+      "success": "#10B981",
+      "danger": "#EF4444",
+      "warning": "#F59E0B",
+      "info": "#3B82F6"
+    },
+    "typography": {
+      "display": { "family": "Geist", "weights": [600, 700], "use_for": ["page_titles", "section_headlines"] },
+      "body":    { "family": "Geist", "weights": [400, 500, 600], "line_height": 1.5 },
+      "mono":    { "family": "Geist Mono", "use_for": ["code", "technical_labels", "metadata"], "avoid_for": ["body", "headlines"] }
+    },
+    "shape": { "radius_sm": 4, "radius_md": 6, "radius_lg": 10, "border_width": 1 },
+    "spacing": {
+      "unit": 4,
+      "section_y":     { "sm": 40, "md": 64, "lg": 96 },
+      "component_gap": { "xs": 4, "sm": 8, "md": 12, "lg": 16 }
+    }
+  },
+  "component_rules": {
+    "button": {
+      "variants": ["primary", "secondary", "ghost", "danger"],
+      "rules": [
+        "Only one primary action per view section",
+        "No diagonal gradients",
+        "Focus, hover, active, disabled and loading states required",
+        "Icon must clarify the action"
+      ]
+    },
+    "card": {
+      "variants": ["default", "interactive", "metric", "empty"],
+      "rules": [
+        "No nested cards",
+        "Use border or surface before heavy shadow in dark UI",
+        "Card must group, compare, execute or reveal"
+      ]
+    },
+    "form": {
+      "variants": ["text", "search", "textarea", "select"],
+      "rules": [
+        "Visible label by default",
+        "Error message must be textual and near the field",
+        "Focus state must be visible",
+        "Mobile tap targets minimum 44px"
+      ]
+    },
+    "navigation": {
+      "variants": ["sidebar", "topbar", "tabs", "breadcrumb"],
+      "rules": [
+        "Active state must be unambiguous",
+        "Do not hide critical navigation for aesthetics",
+        "Mobile behavior must be defined"
+      ]
+    },
+    "modal": {
+      "variants": ["confirm", "form", "detail"],
+      "rules": [
+        "Contextual title required",
+        "Escape/cancel behavior required",
+        "Destructive actions require explicit confirmation",
+        "Focus trap required"
+      ]
+    }
+  },
+  "motion": {
+    "personality": {
+      "energy": "precise",
+      "elasticity": "snap_not_bounce",
+      "directionality": "mechanical",
+      "sequencing": "subtle_stagger",
+      "distance": "short",
+      "restraint": "high"
+    },
+    "durations_ms": { "instant": 80, "fast": 140, "base": 220, "slow": 320 },
+    "rules": [
+      "Respect prefers-reduced-motion",
+      "No above-fold fade-in longer than 300ms",
+      "No bounce unless explicitly declared",
+      "Avoid layout-shifting animation"
+    ]
+  },
+  "anti_slop": {
+    "forbidden_colors": ["#6366F1", "#8B5CF6", "#A855F7"],
+    "restricted_hues": [
+      {
+        "name": "default_ai_purple_blue",
+        "hue_range": [235, 285],
+        "allowed_only_if": ["brand_declares_purple_as_primary", "archetype_primary_is_magician"]
+      }
+    ],
+    "forbidden_patterns": [
+      "diagonal blue-purple gradient hero",
+      "glassmorphism cards over blurred blobs",
+      "three generic feature cards with icons",
+      "Inter on white with purple CTA as default SaaS identity",
+      "rounded-3xl everywhere",
+      "shadow-2xl as default depth",
+      "generic browser mockup with fake dashboard",
+      "robot icon en círculo gradient como hero visual",
+      "AI-magic copy"
+    ]
+  },
+  "contexts": {
+    "web_app": { "density": "balanced", "motion": "crisp", "navigation": "full" },
+    "mobile_native": { "density": "slightly_spacious", "tap_target_min": 44, "navigation": "platform_native" },
+    "vertical_video": { "contrast": "higher", "type_scale": "larger", "safe_area": true, "copy": "shorter" },
+    "pitch_slides": { "editoriality": "higher", "density": "lower" },
+    "transactional_email": { "motion": "none", "fallback_fonts": ["Arial", "Helvetica"], "layout": "single_column_first" }
+  },
+  "validation": {
+    "min_contrast_body": 4.5,
+    "min_contrast_large": 3,
+    "max_fonts": 2,
+    "max_radius_values": 3,
+    "max_primary_color_usage_percent": 18,
+    "brand_score_weights": {
+      "accessibility": 30,
+      "token_compliance": 25,
+      "component_compliance": 20,
+      "anti_slop": 15,
+      "voice_and_archetype": 10
+    }
+  }
+}

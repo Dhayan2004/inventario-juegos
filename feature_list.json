@@ -1,0 +1,311 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "2 — Blueprint aprobado (pre-build). Todas las features en 'pending'; /build activa F1-01.",
+  "project": "Inventario de Videojuegos",
+  "blueprint": ".claude/PRPs/BLUEPRINT-inventario-juegos.md",
+  "notes": "Generado desde el repo de contexto (el repo de producto aun no existe). Reglas del arne activas: R1 WIP=1, R2 commits convencionales, R3 rama por feature, R7 three-layer, R10 Brand DNA, R14 confirmacion tipada en destructivas, AP8 passing solo con CI verde. Sin codigo de implementacion: 'verification' son los comandos que deberan existir y pasar; ninguno corre todavia.",
+  "features": [
+    {
+      "id": "F1-01",
+      "phase": 1,
+      "behavior": "El proyecto arranca en local desde el template Forge y cumple el Bootstrap Contract (R11): feature_list.json valido con >=3 features y verification, skills.md generado, >=1 test corriendo.",
+      "verification": "make preflight",
+      "state": "pending",
+      "branch": "chore/bootstrap-contract",
+      "acceptance": [
+        "make setup exit 0",
+        "make preflight exit 0",
+        ">=1 test passing"
+      ],
+      "blueprint_ref": "F1 / Subfase 1.1"
+    },
+    {
+      "id": "F1-02",
+      "phase": 1,
+      "behavior": "Existe la entidad game con su migracion; la migracion aplica y revierte limpio en una DB de prueba y deja RLS activo en la tabla (L-001).",
+      "verification": "npm run test -- game-migration",
+      "state": "pending",
+      "branch": "feature/game-schema",
+      "acceptance": [
+        "La migracion up crea la tabla game con los campos de BLUEPRINT §3",
+        "La migracion down revierte sin residuos",
+        "RLS habilitado en game con politica declarada"
+      ],
+      "blueprint_ref": "F1 / Subfase 1.2 (tareas 1.2.1, 1.2.2)"
+    },
+    {
+      "id": "F1-03",
+      "phase": 1,
+      "behavior": "La capa de acceso a datos expone crear / listar / obtener / actualizar / eliminar sobre game, con validacion por whitelist de campos (L-003) y una guarda de confirmacion tipada para el borrado (R14).",
+      "verification": "npm run test -- games-repository",
+      "state": "pending",
+      "branch": "feature/games-repository",
+      "acceptance": [
+        "Alta con payload valido persiste; con campo fuera de whitelist rechaza",
+        "quantity < 1 y rating fuera de rango se rechazan",
+        "El borrado no se ejecuta sin token de confirmacion explicito"
+      ],
+      "blueprint_ref": "F1 / Subfase 1.2 (tarea 1.2.3)"
+    },
+    {
+      "id": "F2-01",
+      "phase": 2,
+      "behavior": "El Brand DNA existe: /add-ui-kit con preset Tech Utility produce brand/brand.json + brand/voice.json + brand/brand.css validos contra el schema R-005 (gate R10).",
+      "verification": "test -f brand/brand.json && test -f brand/voice.json && npm run brand:validate",
+      "state": "pending",
+      "branch": "chore/brand-dna",
+      "acceptance": [
+        "Los 3 archivos de brand existen",
+        "brand:validate exit 0 (schema_version, keyed spacing, motion enums)",
+        "Preset Tech Utility: densidad alta, sin fuentes/gradientes/anti-slop prohibidos"
+      ],
+      "blueprint_ref": "F2 / Subfase 2.1"
+    },
+    {
+      "id": "F2-02",
+      "phase": 2,
+      "behavior": "La vista de Menu Principal se renderiza como panel de control puro: titulo mas tres controles de navegacion con etiqueta de texto (Agregar juegos, Editar registros, Estadisticas), operables por teclado. No muestra datos ni ejecuta acciones de negocio.",
+      "verification": "npm run test:e2e -- main-menu",
+      "state": "pending",
+      "branch": "feature/main-menu-view",
+      "acceptance": [
+        "Los 3 controles presentes con rol de enlace/boton y foco visible",
+        "La vista de menu no importa la capa de datos ni renderiza registros ni conteos",
+        "Cada control apunta a su ruta (/agregar, /editar, /estadisticas)"
+      ],
+      "blueprint_ref": "F2 / Subfase 2.2 (screen flow §4.1)"
+    },
+    {
+      "id": "F2-03",
+      "phase": 2,
+      "behavior": "Existen tres rutas independientes (/agregar, /editar, /estadisticas) como vistas aisladas: URL propia, sin estado compartido en memoria entre ellas, con retorno explicito al menu.",
+      "verification": "npm run test:e2e -- navigation-isolation",
+      "state": "pending",
+      "branch": "feature/isolated-routes",
+      "acceptance": [
+        "Cada opcion del menu navega a su ruta y cada vista tiene control de volver al menu",
+        "Inputs o cambios en una vista no aparecen al entrar a otra",
+        "Recargar una vista no depende del estado de las demas"
+      ],
+      "blueprint_ref": "F2 / Subfase 2.3"
+    },
+    {
+      "id": "F2-04",
+      "phase": 2,
+      "behavior": "El layout base (contenedor, tipografia, tokens) consume brand.json verbatim y pasa el Anti-Slop Gate.",
+      "verification": "npm run test:e2e -- layout",
+      "state": "pending",
+      "branch": "feature/base-layout",
+      "acceptance": [
+        "Tokens de color/tipografia salen de brand.css, no de defaults de Tailwind",
+        "Visual diff vs brand.json en verde (Brand Score >= 75)"
+      ],
+      "blueprint_ref": "F2 / Subfase 2.1 (tarea 2.1.2)"
+    },
+    {
+      "id": "F3-01",
+      "phase": 3,
+      "behavior": "La vista Agregar muestra un formulario con los campos de BLUEPRINT §3, validacion por campo y mensajes de error inline bajo el campo que falla.",
+      "verification": "npm run test:e2e -- add-game-form",
+      "state": "pending",
+      "branch": "feature/add-game-form",
+      "acceptance": [
+        "Requeridos vacios (title, platform, status, quantity) bloquean el envio",
+        "Error de validacion aparece inline bajo el campo correspondiente",
+        "quantity < 1 se rechaza en el formulario"
+      ],
+      "blueprint_ref": "F3 (screen flow §4.2)"
+    },
+    {
+      "id": "F3-02",
+      "phase": 3,
+      "behavior": "Enviar el formulario de alta persiste el juego via la capa de datos, muestra confirmacion visible y deja el formulario limpio para otra alta.",
+      "verification": "npm run test:e2e -- add-game-persist",
+      "state": "pending",
+      "branch": "feature/add-game-persist",
+      "acceptance": [
+        "Tras enviar, el registro existe en datos con los valores cargados",
+        "Mensaje de exito visible con el titulo del juego",
+        "El formulario queda limpio y listo para otra carga"
+      ],
+      "blueprint_ref": "F3"
+    },
+    {
+      "id": "F3-03",
+      "phase": 3,
+      "behavior": "La vista Agregar maneja estado de carga y error de servidor sin perder lo tecleado.",
+      "verification": "npm run test:e2e -- add-game-errors",
+      "state": "pending",
+      "branch": "feature/add-game-errors",
+      "acceptance": [
+        "Durante el guardado el boton queda en estado de carga y no permite doble envio",
+        "Si el guardado falla, el formulario conserva todos los valores y muestra el error"
+      ],
+      "blueprint_ref": "F3"
+    },
+    {
+      "id": "F4-01",
+      "phase": 4,
+      "behavior": "La vista Editar lista los registros existentes con sus datos clave y permite filtrar por titulo/plataforma; con cero registros muestra un estado vacio con enlace a la vista Agregar.",
+      "verification": "npm run test:e2e -- edit-list",
+      "state": "pending",
+      "branch": "feature/edit-list",
+      "acceptance": [
+        "Se listan todos los registros con titulo, plataforma y estado",
+        "Filtrar por texto reduce la lista",
+        "Con 0 registros se ve el estado vacio con enlace a /agregar"
+      ],
+      "blueprint_ref": "F4 / Subfase 4.1 (screen flow §4.3)"
+    },
+    {
+      "id": "F4-02",
+      "phase": 4,
+      "behavior": "Seleccionar un registro abre su formulario precargado; guardar persiste los cambios y el listado refleja el valor nuevo.",
+      "verification": "npm run test:e2e -- edit-update",
+      "state": "pending",
+      "branch": "feature/edit-update",
+      "acceptance": [
+        "El formulario abre con todos los campos precargados del registro elegido",
+        "Cambiar un campo y guardar actualiza datos y el listado",
+        "updated_at cambia tras la edicion"
+      ],
+      "blueprint_ref": "F4 / Subfase 4.2 (tarea 4.2.1)"
+    },
+    {
+      "id": "F4-03",
+      "phase": 4,
+      "behavior": "Eliminar un registro exige confirmacion tipada (escribir el titulo o ELIMINAR); sin confirmacion no borra; con confirmacion correcta el registro desaparece de datos y del listado. Sin ejecucion automatica (R14).",
+      "verification": "npm run test:e2e -- edit-delete",
+      "state": "pending",
+      "branch": "feature/edit-delete",
+      "acceptance": [
+        "El boton Eliminar abre un paso de confirmacion tipada",
+        "Confirmacion vacia o incorrecta no borra nada",
+        "Confirmacion correcta elimina el registro de datos y de la lista"
+      ],
+      "blueprint_ref": "F4 / Subfase 4.2 (tarea 4.2.2) — supuesto ⚠️, requiere confirmacion de alcance"
+    },
+    {
+      "id": "F5-01",
+      "phase": 5,
+      "behavior": "Existe una funcion de agregacion que calcula: total de juegos (suma quantity), registros distintos, conteo por plataforma, por estado y por formato, valor total (precio*quantity), precio promedio y calificacion promedio.",
+      "verification": "npm run test -- stats-aggregations",
+      "state": "pending",
+      "branch": "feature/stats-aggregations",
+      "acceptance": [
+        "Con un dataset fijo, cada metrica devuelve el valor esperado exacto",
+        "Registros con precio o rating nulos no rompen los promedios",
+        "Con dataset vacio todas las metricas devuelven cero o vacio sin error"
+      ],
+      "blueprint_ref": "F5 (metricas §5)"
+    },
+    {
+      "id": "F5-02",
+      "phase": 5,
+      "behavior": "La vista Estadisticas renderiza las metricas como tarjetas numericas mas desgloses por categoria; es de solo lectura y no muta datos ni enlaza a otras vistas salvo volver al menu.",
+      "verification": "npm run test:e2e -- statistics-view",
+      "state": "pending",
+      "branch": "feature/statistics-view",
+      "acceptance": [
+        "Cada metrica de §5 visible con su valor",
+        "La vista no expone controles de edicion ni de borrado",
+        "El unico enlace de salida es volver al menu"
+      ],
+      "blueprint_ref": "F5 (screen flow §4.4)"
+    },
+    {
+      "id": "F5-03",
+      "phase": 5,
+      "behavior": "Con cero registros la vista Estadisticas muestra un estado vacio coherente (Sin juegos cargados todavia) y metricas en cero, sin errores.",
+      "verification": "npm run test:e2e -- statistics-empty",
+      "state": "pending",
+      "branch": "feature/statistics-empty",
+      "acceptance": [
+        "Sin datos: mensaje de vacio visible",
+        "Ninguna metrica lanza NaN o error de render"
+      ],
+      "blueprint_ref": "F5 (tarea 5.1.3)"
+    },
+    {
+      "id": "F6-01",
+      "phase": 6,
+      "behavior": "La Three-Layer Verification completa del sistema pasa: typecheck, lint, tests unit y e2e, todo en verde, con cobertura sobre capa de datos y agregaciones dentro del target.",
+      "verification": "make typecheck && make lint && make test && make e2e",
+      "state": "pending",
+      "branch": "chore/full-verification",
+      "acceptance": [
+        "Los 4 comandos exit 0",
+        "Cobertura >= target de acceptance-targets sobre games-repository y stats-aggregations"
+      ],
+      "blueprint_ref": "F6 (tarea 6.1.1)"
+    },
+    {
+      "id": "F6-02",
+      "phase": 6,
+      "behavior": "El menu y todos los formularios son operables solo con teclado (foco visible, orden de tabulacion logico, labels y roles correctos) y cumplen WCAG 2.1 AA en lo verificable.",
+      "verification": "npm run test:e2e -- a11y",
+      "state": "pending",
+      "branch": "feature/accessibility",
+      "acceptance": [
+        "Recorrer menu y cada vista solo con teclado completa los flujos principales",
+        "El checker de accesibilidad no reporta violaciones criticas",
+        "Todos los inputs tienen label asociado"
+      ],
+      "blueprint_ref": "F6 (tarea 6.1.2)"
+    },
+    {
+      "id": "F6-03",
+      "phase": 6,
+      "behavior": "Cada vista se puede abrir por deep-link directo a su URL sin pasar por el menu y carga correctamente; una vista con error no tumba a las demas.",
+      "verification": "npm run test:e2e -- deep-links",
+      "state": "pending",
+      "branch": "feature/deep-links",
+      "acceptance": [
+        "Abrir /agregar, /editar y /estadisticas directo por URL funciona",
+        "Forzar un error en una vista no impide navegar a las otras desde el menu"
+      ],
+      "blueprint_ref": "F6 (tarea 6.1.3)"
+    },
+    {
+      "id": "F7-01",
+      "phase": 7,
+      "behavior": "La auditoria web (Lighthouse + Core Web Vitals + WCAG + SEO + Best Practices) corre y queda dentro de umbral, sin fallos bloqueantes.",
+      "verification": "npm run web-quality",
+      "state": "pending",
+      "branch": "chore/web-quality-audit",
+      "acceptance": [
+        "Metricas dentro de los umbrales definidos por /web-quality",
+        "Sin fallos marcados como bloqueantes"
+      ],
+      "blueprint_ref": "F7 (tarea 7.1.1)"
+    },
+    {
+      "id": "F7-02",
+      "phase": 7,
+      "behavior": "La auditoria adversarial con Codex (el-guardian) sobre RLS en game, validacion de entrada, R14 en el borrado y ausencia de secretos en logs cierra con Critical = 0 y High = 0.",
+      "verification": "npm run audit:security -- --max-severity=medium",
+      "state": "pending",
+      "branch": "chore/security-audit",
+      "acceptance": [
+        "SECURITY-AUDIT-inventario-juegos.md generado",
+        "Cero hallazgos Critical y cero High",
+        "Hallazgos Medium/Low documentados con decision"
+      ],
+      "blueprint_ref": "F7 (tarea 7.1.2)"
+    },
+    {
+      "id": "F7-03",
+      "phase": 7,
+      "behavior": "La app queda desplegada en produccion y un smoke e2e del happy path (menu -> agregar -> editar -> estadisticas) pasa contra la URL real.",
+      "verification": "npm run test:e2e:smoke -- --base-url=$PRODUCTION_URL",
+      "state": "pending",
+      "branch": "chore/production-deploy",
+      "acceptance": [
+        "Deploy a produccion completado (Vercel o Coolify)",
+        "Smoke e2e verde contra la URL de produccion",
+        "Definicion de terminado de la casa: 5/5 (funciona donde se usa, verificado, escrito, cliente avisado, promovido lo reutilizable)"
+      ],
+      "blueprint_ref": "F7 (tareas 7.1.3, 7.1.4)"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# Forja commit-msg hook
+# Enforces:
+#   R2 — Conventional Commits format
+#   R5 — memory writer scope (authoritative gate)
+# Source: forja/CONSTRAINTS.md
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+COMMIT_MSG_FILE="${1:-$REPO_ROOT/.git/COMMIT_EDITMSG}"
+
+# Skip if no message file
+if [[ ! -f "$COMMIT_MSG_FILE" ]]; then
+  exit 0
+fi
+
+# Read first non-comment line
+FIRST_LINE=$(grep -v '^#' "$COMMIT_MSG_FILE" 2>/dev/null | head -1 || true)
+
+# Skip empty / merge / revert / fixup commits
+if [[ -z "$FIRST_LINE" ]]; then
+  exit 0
+fi
+if [[ "$FIRST_LINE" =~ ^Merge\  ]] || \
+   [[ "$FIRST_LINE" =~ ^Revert\  ]] || \
+   [[ "$FIRST_LINE" =~ ^fixup! ]] || \
+   [[ "$FIRST_LINE" =~ ^squash! ]]; then
+  exit 0
+fi
+
+# ─── R2: Conventional Commits format ────────────────────────────────────────
+# Types: feat fix refactor chore docs test style perf ci build evaluator memory
+# Scope: case-insensitive alphanum + dashes (allows F2-S1, D-003, auth, ui-kit)
+# Description: ≥10 chars
+R2_TYPES='feat|fix|refactor|chore|docs|test|style|perf|ci|build|evaluator|memory|spec'
+R2_REGEX="^($R2_TYPES)\\(([A-Za-z0-9-]+)\\): .{10,}\$"
+
+if [[ ! "$FIRST_LINE" =~ $R2_REGEX ]]; then
+  cat >&2 <<EOF
+❌ R2 violación: commit message no sigue Conventional Commits.
+
+Mensaje actual:
+  $FIRST_LINE
+
+Formato esperado: <type>(<scope>): <description>
+  - type:        feat | fix | refactor | chore | docs | test | style | perf | ci | build | evaluator | memory | spec
+  - scope:       case-insensitive alphanum + dashes (ej: F2-S1, D-003, auth, ui-kit)
+  - description: imperativo, ≥10 chars, sin punto final
+
+Ejemplos válidos:
+  feat(F4-T2): pre-commit hook with R1 enforcement
+  chore(memory): record E-005 RLS gap
+  evaluator(D-003): adopt walkinglabs L09 verification
+  fix(auth): redirect after sign-in respects callbackUrl
+
+Source: CONSTRAINTS.md R2
+EOF
+  exit 1
+fi
+
+# ─── R5: memory writer scope (authoritative) ────────────────────────────────
+STAGED_MEMORY=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | grep -E '^\.claude/memory/.+\.md$' || true)
+
+if [[ -n "$STAGED_MEMORY" ]]; then
+  # Match: type=evaluator|memory  OR  scope=evaluator|memory
+  R5_REGEX_TYPE="^(evaluator|memory)\\([A-Za-z0-9-]+\\): .{10,}\$"
+  R5_REGEX_SCOPE="^[a-z]+\\((evaluator|memory)\\): .{10,}\$"
+
+  if [[ ! "$FIRST_LINE" =~ $R5_REGEX_TYPE ]] && [[ ! "$FIRST_LINE" =~ $R5_REGEX_SCOPE ]]; then
+    cat >&2 <<EOF
+❌ R5 violación: commit toca .claude/memory/** pero ni el type ni el scope son evaluator|memory.
+
+Archivos memory tocados:
+$(echo "$STAGED_MEMORY" | sed 's|^|  |')
+
+Mensaje actual:
+  $FIRST_LINE
+
+Solo el-evaluador puede modificar la memoria (R5 — sole writer).
+Si el commit es legítimamente del rol evaluator, usá uno de:
+
+  evaluator(<id>): <description>     # ej: evaluator(D-005): adopt new pattern
+  memory(<id>): <description>         # ej: memory(E-002): record RLS error
+  chore(memory): <description>        # ej: chore(memory): rotate refs cache
+  chore(evaluator): <description>     # ej: chore(evaluator): promote E-007 → L-012
+
+Source: CONSTRAINTS.md R5
+EOF
+    exit 1
+  fi
+fi
+
+# ─── R19: spec ownership — commits que tocan el spec llevan type|scope spec ──
+STAGED_SPEC=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | grep -E '^(SPEC\.md|CONTEXT\.md|docs/adr/.+)' || true)
+
+if [[ -n "$STAGED_SPEC" ]]; then
+  R19_REGEX_TYPE="^spec\\([A-Za-z0-9-]+\\): .{10,}\$"
+  R19_REGEX_SCOPE="^[a-z]+\\(spec\\): .{10,}\$"
+
+  if [[ ! "$FIRST_LINE" =~ $R19_REGEX_TYPE ]] && [[ ! "$FIRST_LINE" =~ $R19_REGEX_SCOPE ]]; then
+    cat >&2 <<EOF
+❌ R19 violación: commit toca el spec (SPEC.md/CONTEXT.md/docs/adr/**) pero ni el type ni el scope son spec.
+
+Archivos de spec tocados:
+$(echo "$STAGED_SPEC" | sed 's|^|  |')
+
+Mensaje actual:
+  $FIRST_LINE
+
+El humano es dueño del SPEC (R19): cada cambio de contrato deja rastro grep-able.
+Usá uno de:
+
+  spec(<seccion>): <description>     # ej: spec(s3-funcionalidades): agregar export CSV
+  docs(spec): <description>          # ej: docs(spec): corregir glosario CONTEXT.md
+
+Source: CONSTRAINTS.md R19
+EOF
+    exit 1
+  fi
+fi
+
+exit 0

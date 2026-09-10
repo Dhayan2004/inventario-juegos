@@ -1,0 +1,17 @@
+{
+  "_comment": "Forja MCP server template. Copy to .mcp.json (gitignored) and replace placeholders. Entries marked REQUIRED are dependencies of core skills; entries marked OPTIONAL can be removed if the corresponding skill is not in use. Audit trimestral (AP4): cualquier entry sin uso real se elimina.",
+  "_required_entries": ["context7"],
+  "mcpServers": {
+    "context7": {
+      "_status": "REQUIRED",
+      "_consumed_by": ["find-docs", "el-migrador", "baas", "ai"],
+      "_reason": "Wrapper over Context7 (https://github.com/upstash/context7) — up-to-date docs for external libs. Default tool of `find-docs` skill. Resuelve alucinación de sintaxis post-cutoff. R13 enforces [docs:libname] citation grammar for any external-lib claim.",
+      "_alt_form_stdio": "Optional fallback: replace url+headers with `\"command\": \"npx\", \"args\": [\"-y\", \"@upstash/context7-mcp@latest\"], \"env\": {\"CONTEXT7_API_KEY\": \"${CONTEXT7_API_KEY}\"}` if remote MCP is blocked.",
+      "url": "https://mcp.context7.com/mcp",
+      "type": "http",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
+    }
+  }
+}

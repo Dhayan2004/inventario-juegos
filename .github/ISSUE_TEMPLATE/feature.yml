@@ -1,0 +1,62 @@
+# feature.yml — Issue form para una feature de build (S2 · Equipos GitHub-native).
+#
+# IMPORTANTE (R18 — espejo de una sola vía): este formulario es una PROYECCIÓN legible de una feature de
+# feature_list.json, NO su fuente. La verdad del estado (active/passing/blocked) la gobiernan los hooks
+# (R1 + R7 + AP8) sobre feature_list.json; cerrar este Issue NO marca la feature `passing`. El flujo
+# correcto es /capataz, que sincroniza feature_list.json → Issues. Editar el `state` aquí NO cambia el build.
+# Doctrina: ../../.claude/skills/el-capataz/references/github-native.md §7.
+name: Feature (build)
+description: Proyección de una feature de feature_list.json (la verdad vive ahí — R18, no aquí).
+title: "[<feature-id>] <behavior>"
+labels: ["forge:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Espejo de una sola vía (R18).** La fuente de verdad de esta feature es `feature_list.json`,
+        no este Issue. Cerrarlo NO marca la feature `passing` — eso lo gobiernan los hooks (R1 + R7 + AP8).
+        Lo ideal es crear/sincronizar features con `/capataz`, no a mano.
+  - type: input
+    id: feature_id
+    attributes:
+      label: Feature ID
+      description: El id de la feature en feature_list.json (debe coincidir exactamente).
+      placeholder: F1-T2
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior (qué hace para el usuario)
+      description: La conducta observable que esta feature entrega. Una frase, orientada al usuario.
+      placeholder: El usuario puede invitar a un miembro a su organización por email.
+    validations:
+      required: true
+  - type: input
+    id: verification
+    attributes:
+      label: Verification command
+      description: El comando que prueba la feature (R7). Debe salir exit 0 para considerarla verde.
+      placeholder: make test -- teams/invite
+    validations:
+      required: true
+  - type: dropdown
+    id: state
+    attributes:
+      label: State (reflejo de feature_list.json — NO autoritativo)
+      description: >
+        Sólo refleja el estado actual del JSON. Cambiarlo aquí NO muta feature_list.json (R18).
+      options:
+        - active
+        - passing
+        - blocked
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notas / bloqueadores (opcional)
+      description: Contexto, dependencias o el motivo si está `blocked`. Si hay CI, citá `[ci:run#<id>]`.
+    validations:
+      required: false

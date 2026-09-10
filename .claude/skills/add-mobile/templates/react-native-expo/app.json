@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "{{ APP_NAME }}",
+    "slug": "{{ APP_SLUG }}",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "{{ TOKEN_BACKGROUND_COLOR }}"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "{{ APP_ID }}",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "{{ TOKEN_BACKGROUND_COLOR }}"
+      },
+      "package": "{{ APP_ID }}",
+      "versionCode": 1,
+      "permissions": ["NOTIFICATIONS", "VIBRATE", "WAKE_LOCK"]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "{{ TOKEN_PRIMARY_COLOR }}",
+          "defaultChannel": "default"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "{{ EAS_PROJECT_ID }}"
+      }
+    }
+  }
+}

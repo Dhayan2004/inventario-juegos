@@ -1,0 +1,69 @@
+{
+  "$schema_source": "[memory:references#R-005] — .claude/references/BRAND_DNA_SCHEMA.md sección 9.2",
+  "$generated_by": "add-ui-kit ({{ mode }} mode, {{ baseline_preset }} preset baseline)",
+  "$generated_at": "{{ generated_at_iso }}",
+  "schema_version": "1.0.0",
+  "voice": {
+    "name": "{{ voice.name | default: brand.product }}",
+    "language": "{{ voice.language | default: 'es-419' }}",
+    "language_rules": {{ voice.language_rules | default: computed_from_language }},
+    "tone_axes": {
+      "directness": {{ voice.tone_axes.directness }},
+      "warmth": {{ voice.tone_axes.warmth }},
+      "technicality": {{ voice.tone_axes.technicality }},
+      "provocation": {{ voice.tone_axes.provocation }},
+      "hype": {{ voice.tone_axes.hype }}
+    },
+    "principles": [
+      "{{ voice.principles[0] }}",
+      "{{ voice.principles[1] | optional }}",
+      "{{ voice.principles[2] | optional }}",
+      "{{ voice.principles[3] | optional }}",
+      "{{ voice.principles[4] | optional }}"
+    ],
+    "vibe": "{{ voice.vibe }}",
+    "audience": "{{ voice.audience | default: brand.audience.join(' + ') }}",
+    "code_switching": {
+      "allowed": {{ voice.code_switching.allowed | default: [] }},
+      "rule": "{{ voice.code_switching.rule | default: 'Anglicismos técnicos sin traducir cuando son parte natural del oficio' }}"
+    },
+    "safe_words": {{ voice.safe_words | default: [] }},
+    "avoid_words": [
+      "revolutionary",
+      "revolucionario",
+      "cutting-edge",
+      "AI-powered como cualidad principal",
+      "best-in-class",
+      "leverage",
+      "synergy",
+      "disrupt",
+      "ecosystem como relleno",
+      "unlock your potential",
+      "Act now",
+      "Limited time",
+      "barato",
+      "fácil",
+      "increíble",
+      "seamless experience",
+      "effortless",
+      "supercharge your workflow",
+      "game-changing",
+      "next-generation",
+      "transform your business",
+      "all-in-one platform",
+      "scale with confidence"
+      {{ voice.avoid_words.additional | optional_csv_lines }}
+    ],
+    "sentence_rules": {
+      "prefer": {{ voice.sentence_rules.prefer | default: ['Frases cortas', 'Verbos concretos', 'Diagnóstico antes que promesa'] }},
+      "avoid": {{ voice.sentence_rules.avoid | default: ['Superlativos vacíos', 'Promesas absolutas', 'Corporate SaaS filler', 'Hype de IA mágica'] }}
+    },
+    "hooks": {{ voice.hooks | default: [] }},
+    "cta_style": "{{ voice.cta_style | default: 'Directo, no pushy' }}",
+    "cta_examples": {{ voice.cta_examples | default: [] }},
+    "pacing": {
+      "words_per_minute": {{ voice.pacing.words_per_minute | default: 165 }},
+      "pause_after_hook_ms": {{ voice.pacing.pause_after_hook_ms | default: 400 }}
+    }
+  }
+}

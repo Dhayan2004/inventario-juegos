@@ -1,0 +1,34 @@
+# Mode B fixture: UNKNOWN component derivation per R-005 sec 8.2
+# Input: data-table (NOT in component_rules)
+# Expected: derive from card.metric + form.search
+
+mode: B
+component: data-table
+purpose: "muestra rows comparables y permite reordenar para encontrar outliers"
+brand_json_path: .claude/skills/add-ui-kit/tests/expected/brand/brand.json
+voice_json_path: .claude/skills/add-ui-kit/tests/expected/brand/voice.json
+
+target_path: src/shared/components/ui/DataTable/DataTable.tsx
+
+derivation:
+  nearest_components:
+    - "card.metric"
+    - "form.search"
+  posture_shaped:
+    density: 4              # → compact padding + sticky header
+    geometry: 4             # → radius-md (no lg)
+    materiality: 1          # → no shadow
+  inherited_rules:
+    - "focus-visible row state (from card.metric)"
+    - "label clear (from form pattern)"
+  additional_rules:
+    - "aria-sort en sortable headers"
+    - "keyboard row navigation con Arrow keys"
+  must_include:
+    states:
+      - "focus-visible row"
+      - "hover row"
+      - "active selected"
+      - "disabled"
+    responsive_behavior: "mobile = horizontal scroll + sticky first column"
+    accessibility: "role=table, th scope=col, aria-sort, keyboard rows"

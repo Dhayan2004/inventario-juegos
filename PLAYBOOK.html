@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forja Playbook</title>
+<style>:root {
+  --bg-primary:    #0a0a0f;
+  --bg-card:       rgba(255,255,255,0.05);
+  --bg-card-hover: rgba(255,255,255,0.08);
+  --border-card:   rgba(255,255,255,0.1);
+  --text-primary:  #f0f0f5;
+  --text-secondary:rgba(240,240,245,0.6);
+  --text-muted:    rgba(240,240,245,0.4);
+  --accent-green:  #34d399;
+  --accent-yellow: #fbbf24;
+  --accent-red:    #f87171;
+  --accent-blue:   #60a5fa;
+  --accent-purple: #a78bfa;
+  --radius:        16px;
+  --blur:          20px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: system-ui,-apple-system,sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.75;
+  font-size: 15px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+/* ── sidebar ── */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 1rem 2rem 1.25rem;
+  border-right: 1px solid var(--border-card);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-card) transparent;
+}
+.sidebar-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.sidebar ul { list-style: none; }
+.sidebar a {
+  display: block;
+  padding: 0.35rem 0.6rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar a:hover,
+.sidebar a.active { background: var(--bg-card); color: var(--text-primary); }
+.sidebar .muted { color: var(--text-muted); font-size: 0.85rem; padding-left: 0.6rem; }
+.sidebar-toggle {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+/* ── main ── */
+main {
+  padding: 2.5rem 2.5rem 4rem;
+  max-width: 860px;
+  min-width: 0;
+}
+h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 0.5rem; }
+h2 {
+  font-size: 1.35rem;
+  margin: 2.5rem 0 0.9rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-card);
+  scroll-margin-top: 1.5rem;
+}
+h3 { font-size: 1.1rem; margin: 1.75rem 0 0.6rem; color: var(--text-primary); }
+h4 { font-size: 0.95rem; margin: 1.25rem 0 0.4rem; color: var(--text-secondary); }
+p { margin-bottom: 0.85rem; }
+ul { margin: 0.5rem 0 0.85rem 1.5rem; }
+li { margin-bottom: 0.3rem; }
+strong { color: var(--text-primary); }
+em { color: var(--text-secondary); font-style: italic; }
+a { color: var(--accent-blue); text-decoration: none; border-bottom: 1px dashed transparent; transition: border-color 0.15s; }
+a:hover { border-bottom-color: var(--accent-blue); }
+hr { border: none; border-top: 1px solid var(--border-card); margin: 2rem 0; }
+code {
+  font-family: ui-monospace,"SF Mono",Menlo,monospace;
+  font-size: 0.85em;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--border-card);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+pre {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1rem 0 1.25rem;
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+pre code { background: transparent; border: none; padding: 0; font-size: inherit; }
+blockquote {
+  border-left: 3px solid var(--accent-blue);
+  padding: 0.5rem 1.1rem;
+  margin: 1rem 0;
+  background: rgba(96,165,250,0.06);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-secondary);
+}
+blockquote p { margin-bottom: 0.4rem; }
+blockquote p:last-child { margin-bottom: 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.25rem;
+  font-size: 0.88rem;
+}
+th, td {
+  padding: 0.55rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-card);
+}
+th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+tr:hover td { background: rgba(255,255,255,0.03); }
+input[type="checkbox"] { margin-right: 0.4rem; accent-color: var(--accent-green); }
+/* ── mobile ── */
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-card);
+    padding: 1rem;
+  }
+  .sidebar-toggle { display: block; }
+  .sidebar nav { display: none; }
+  .sidebar.open nav { display: block; }
+  main { padding: 1.5rem 1rem 3rem; }
+  h1 { font-size: 1.6rem; }
+}
+/* ── print ── */
+@media print {
+  :root {
+    --bg-primary: #fff;
+    --bg-card: #f5f5f8;
+    --border-card: #ddd;
+    --text-primary: #111;
+    --text-secondary: #555;
+    --text-muted: #888;
+  }
+  .sidebar { display: none; }
+  .layout { display: block; max-width: 100%; }
+  main { padding: 0; max-width: 100%; }
+  pre { backdrop-filter: none; break-inside: avoid; }
+  a { color: inherit; border-bottom: none; }
+  h2 { break-after: avoid; }
+}</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <button class="sidebar-toggle" aria-label="Menú">☰ Secciones</button>
+    <p class="sidebar-title">Contenido</p>
+    <nav>
+<ul>
+<li><a href="#variables-globales-del-proyecto">Variables globales del proyecto</a></li>
+<li><a href="#prompt-1-inicio-de-sesin-warm-start">PROMPT 1 — Inicio de sesión (warm start)</a></li>
+<li><a href="#prompt-2-cierre-de-feature-apertura-de-la-siguiente">PROMPT 2 — Cierre de feature + apertura de la siguiente ⭐</a></li>
+<li><a href="#prompt-3-deploy-despachar">PROMPT 3 — Deploy (despachar)</a></li>
+<li><a href="#prompt-4-auditora-de-seguridad">PROMPT 4 — Auditoría de seguridad</a></li>
+<li><a href="#prompt-5-planificacin-de-feature-nueva-blueprint">PROMPT 5 — Planificación de feature nueva (Blueprint)</a></li>
+<li><a href="#prompt-6-diagnstico-del-entorno">PROMPT 6 — Diagnóstico del entorno</a></li>
+<li><a href="#flujo-de-un-da-tpico-de-trabajo">Flujo de un día típico de trabajo</a></li>
+<li><a href="#cheat-sheet-de-comandos-rpidos">Cheat sheet de comandos rápidos</a></li>
+</ul>
+    </nav>
+  </aside>
+  <main>
+<h1>Forja Playbook — Prompts de Operación Diaria</h1>
+
+<blockquote>
+<p>Colección de prompts listos para copiar y pegar. Diseñados para que cambies lo mínimo posible entre proyectos. Todo lo que necesitas reemplazar está entre <code>{{dobles llaves}}</code>.</p>
+</blockquote>
+<p>&gt;</p>
+<blockquote>
+<p><strong>Guarda este archivo abierto mientras trabajas.</strong> Vive en la raíz de tu proyecto junto con AGENTS.md.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="variables-globales-del-proyecto">Variables globales del proyecto</h2>
+
+<p>Completa esto una sola vez por proyecto y úsalo como referencia para los prompts:</p>
+
+<pre><code class="lang-text">PROJECT_NAME  = {{nombre del proyecto, ej: "hila"}}
+BLUEPRINT     = .claude/PRPs/BLUEPRINT-{{nombre}}.md
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-1-inicio-de-sesin-warm-start">PROMPT 1 — Inicio de sesión (warm start)</h2>
+
+<p><strong>Cuándo usarlo:</strong> cada vez que abres Claude Code en un proyecto Forja después de haber cerrado la sesión anterior.</p>
+
+<p><strong>Qué cambiar:</strong> solo <code>{{PROJECT_NAME}}</code>.</p>
+
+<hr>
+
+<pre><code class="lang-text">Eres el agente de Forja trabajando en el proyecto {{PROJECT_NAME}}.
+
+PASO 0 — Lee en orden ANTES de hacer cualquier otra cosa:
+  1. AGENTS.md
+  2. feature_list.json
+  3. PROGRESS.md
+  4. .claude/memory/decisions.md (solo las últimas 10 entradas)
+  5. git log --oneline -10
+
+REPORTA esto al terminar la lectura:
+  - Feature activa: [ID de la feature con state "active", o "ninguna"]
+  - Branch actual: [git rev-parse --abbrev-ref HEAD]
+  - Última sesión: [fecha + resumen de PROGRESS.md]
+  - Próximo paso sugerido: [según Blueprint y feature_list.json]
+
+LUEGO:
+  Si hay feature activa → pregúntame "¿Continuamos con [ID]?" antes de tocar código.
+  Si no hay feature activa → muéstrame el backlog (features en "pending") y espera.
+
+Reglas activas todo el tiempo: R1 (WIP=1) · R2 (commits convencionales) ·
+R7 (three-layer verify antes de marking passing) · R10 (Brand DNA si hay UI).
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-2-cierre-de-feature-apertura-de-la-siguiente">PROMPT 2 — Cierre de feature + apertura de la siguiente ⭐</h2>
+
+<p><strong>El más importante del playbook.</strong> Úsalo cuando terminas de construir una feature y quieres pasar a la siguiente.</p>
+
+<p><strong>Qué cambiar:</strong> <code>{{PROJECT_NAME}}</code>, <code>{{FEATURE_ID}}</code> (ej: F1-T2), <code>{{FEATURE_BEHAVIOR}}</code> (una línea de qué hacía). El resto es automático.</p>
+
+<hr>
+
+<pre><code class="lang-text">Cerramos {{FEATURE_ID}} ({{FEATURE_BEHAVIOR}}) y abrimos la siguiente.
+
+═══════════════════════════════════════════════
+PARTE A — CERRAR {{FEATURE_ID}}
+═══════════════════════════════════════════════
+
+PASO A1 — Three-Layer Verification (R7). Ejecutar en orden, parar si falla alguno:
+
+  make typecheck &amp;&amp; make lint    # Layer 1 — Syntax
+  make test                      # Layer 2 — Runtime
+  make build                     # Layer 3 — System (make e2e si está configurado)
+
+Si Layer 1 falla → STOP. No avances. Muéstrame los errores.
+Si Layer 2 falla → STOP. No avances. Muéstrame los errores.
+Si Layer 3 falla → STOP. No avances. Muéstrame los errores.
+
+PASO A2 — Marcar passing (solo si R7 pasó):
+
+  Editar feature_list.json:
+    - state: "passing"
+    - evidence: "three-layer verified, [FECHA HOY], Layer 1+2+3 exit 0"
+    - commit: [hash del último commit de la feature]
+
+  Commit:
+    evaluator({{FEATURE_ID}}): mark passing — three-layer verified
+
+PASO A3 — Actualizar PROGRESS.md. Agregar sección:
+
+  ## [FECHA HOY]
+  ### Feature cerrada: {{FEATURE_ID}} — {{FEATURE_BEHAVIOR}}
+  **Estado:** passing ✅
+  **Commits de esta sesión:**
+  [git log --oneline main..HEAD o el rango de la sesión]
+  **Próxima feature:** [ID de la siguiente]
+
+  Commit:
+    chore(progress): cierre sesión {{FEATURE_ID}}
+
+═══════════════════════════════════════════════
+PARTE B — ABRIR SIGUIENTE FEATURE
+═══════════════════════════════════════════════
+
+PASO B1 — Mostrarme el backlog. Leer feature_list.json y listar en formato:
+
+  | ID | Behavior (primeras 80 chars) | Branch |
+  |----|------------------------------|--------|
+  | [todas las features en state "pending"] |
+
+Esperar mi confirmación antes de B2. Si hay una sola opción obvia, sugerirla.
+
+PASO B2 — Activar la feature elegida [esperar que yo confirme cuál]:
+
+  git checkout main
+  git checkout -b feature/{{NEXT_FEATURE_SLUG}}
+
+  Editar feature_list.json:
+    - state: "active"
+    - branch: "feature/{{NEXT_FEATURE_SLUG}}"
+
+  Commit:
+    chore({{NEXT_FEATURE_ID}}): activate feature — branch feature/{{NEXT_FEATURE_SLUG}}
+
+PASO B3 — Leer contexto de la nueva feature:
+
+  1. BLUEPRINT-{{PROJECT_NAME}}.md → sección de {{NEXT_FEATURE_ID}}
+  2. Si existe .claude/PRPs/PIEZA-{{NEXT_FEATURE_ID}}.md → leerla
+  3. .claude/memory/decisions.md → decisiones relevantes para esta feature
+
+Presentar resumen:
+
+  "Arrancando {{NEXT_FEATURE_ID}}: [behavior]
+   Dependencias: [otras features passing que esta consume]
+   Primer paso concreto: [del Blueprint]
+   Brand DNA: [✅ brand.json existe / ❌ falta — correr /add-ui-kit primero]"
+
+Esperar mi "go" antes de escribir código.
+
+═══════════════════════════════════════════════
+REGLAS:
+  R1: solo 1 feature "active" a la vez — verificar antes de activar.
+  R2: todos los commits en formato feat/fix/chore/evaluator(SCOPE): descripción.
+  R10: si la nueva feature tiene UI → leer brand.json + voice.json ANTES de generar.
+  R14: si hay tools destructivas → typed confirmation, sin execute() automático.
+═══════════════════════════════════════════════
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-3-deploy-despachar">PROMPT 3 — Deploy (despachar)</h2>
+
+<p><strong>Cuándo usarlo:</strong> cuando una feature está en "passing" y quieres crear el PR y pushear.</p>
+
+<p><strong>Qué cambiar:</strong> <code>{{FEATURE_ID}}</code>. El resto lo maneja <code>/despachar</code> automáticamente.</p>
+
+<hr>
+
+<pre><code class="lang-text">Preparar y despachar la feature {{FEATURE_ID}} a producción.
+
+VERIFICAR ANTES DE CONTINUAR (si alguno falla, decirme cuál y parar):
+  [ ] feature_list.json: {{FEATURE_ID}} tiene state "passing"
+  [ ] Solo hay 1 feature en state "active" o ninguna (R1)
+  [ ] Branch actual != main
+  [ ] make preflight exit 0
+
+Si todo pasa → ejecutar:
+
+  /despachar
+
+El protocolo es non-interactive. Solo pausar si:
+  - Branch == main → ABORT + decirme
+  - R1 violation (&gt;1 active) → ABORT + decirme
+  - Cualquier layer R7 falla → ABORT + mostrar errores exactos
+  - Review pre-landing encuentra issue CRITICAL → pausar + mostrar cada uno con fix sugerido
+
+Al terminar → reportar la URL del PR creado.
+Después del PR → ejecutar /web-quality si hay cambios de UI.
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-4-auditora-de-seguridad">PROMPT 4 — Auditoría de seguridad</h2>
+
+<p><strong>Cuándo usarlo:</strong> después de cualquier feature que toque auth, payments, API routes, RLS, webhooks, o LLM inputs. Antes de deploy en features sensibles.</p>
+
+<p><strong>Qué cambiar:</strong> <code>{{FEATURE_ID}}</code>, <code>{{FEATURE_PATH}}</code> (ej: <code>src/features/payments/</code>).</p>
+
+<hr>
+
+<pre><code class="lang-text">Auditoría de seguridad pre-deploy para {{FEATURE_ID}}.
+
+INVOCAR:
+  /el-guardian
+
+El audit usa Codex como segundo cerebro independiente del agente que generó el código.
+
+SCOPE — cubrir las 3 capas:
+  1. OWASP Top 10 2025 — foco en el path {{FEATURE_PATH}}/**
+  2. Vibe-coding risks:
+     - Prompt injection en inputs que llegan a LLMs
+     - Secrets en logs o error messages
+     - Ghost packages (deps AI-suggested no verificadas)
+  3. Forja gates:
+     - RLS en cada tabla nueva con user_id (L-001)
+     - R14: tools destructivas sin execute() automático
+     - Brand DNA leak: tokens hardcoded fuera de brand.css
+
+CRITERIO DE PASO:
+  Critical = 0 AND High = 0
+  
+Si hay Critical o High → NO proceder con deploy.
+El output es SECURITY-AUDIT-{{FEATURE_ID}}.md.
+
+Si el audit pasa → continuar con PROMPT 3 (deploy).
+Si el audit falla → mostrarme los findings con severidad y fix recomendado.
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-5-planificacin-de-feature-nueva-blueprint">PROMPT 5 — Planificación de feature nueva (Blueprint)</h2>
+
+<p><strong>Cuándo usarlo:</strong> cuando vas a comenzar un proyecto desde cero o quieres planificar una feature nueva que no está en el Blueprint.</p>
+
+<p><strong>Qué cambiar:</strong> nada. La Herrería te guía con preguntas.</p>
+
+<hr>
+
+<pre><code class="lang-text">Quiero planificar un proyecto/feature nuevo.
+
+Invocar: /plan
+
+La Herrería va a guiarme con el Mode Selector (SaaS completo, MVP,
+Landing Page, etc.) y el pipeline de assets hasta producir un Blueprint.
+
+Antes de empezar, verificar:
+  [ ] make preflight exit 0 (o /forge-check para diagnóstico)
+  [ ] feature_list.json existe (aunque sea vacío)
+
+No generar código hasta tener Blueprint aprobado.
+</code></pre>
+
+<hr>
+
+<h2 id="prompt-6-diagnstico-del-entorno">PROMPT 6 — Diagnóstico del entorno</h2>
+
+<p><strong>Cuándo usarlo:</strong> primera vez en un proyecto, después de instalar Forja en un proyecto existente, o cuando algo no funciona como esperas.</p>
+
+<p><strong>Qué cambiar:</strong> nada.</p>
+
+<hr>
+
+<pre><code class="lang-text">Diagnosticar el entorno Forja de este proyecto.
+
+Ejecutar: /forge-check
+
+Luego reportar el resultado con esta estructura:
+  ✅ / ❌ Cada gate del Bootstrap Contract (R11)
+  ✅ / ❌ Dependencias Node (next, zod, zustand, @supabase/supabase-js)
+  ✅ / ❌ Brand DNA (brand.json + voice.json)
+  ✅ / ❌ Skills disponibles (la-herreria, el-evaluador, el-guardian, etc.)
+
+Por cada ❌ → sugerir el fix exacto con el comando a correr.
+Por cada ⚠️ → explicar el impacto y si bloquea o no el flujo.
+</code></pre>
+
+<hr>
+
+<h2 id="flujo-de-un-da-tpico-de-trabajo">Flujo de un día típico de trabajo</h2>
+
+<pre><code class="lang-text">Mañana
+  └── PROMPT 1 (warm start) → ver en qué quedé, confirmar feature activa
+
+Durante el día
+  └── trabajar en la feature activa (la-forja / el-yunque)
+  └── make typecheck después de cada cambio grande
+  └── commits atómicos: feat(ID): descripción
+
+Al terminar una feature
+  └── PROMPT 2 (cierre + apertura) ← el más importante, 6 pasos
+
+Antes de subir a producción
+  └── PROMPT 4 (security audit) si la feature toca auth/payments/API
+  └── PROMPT 3 (deploy) → PR creado + URL reportada
+
+Cada semana
+  └── PROMPT 5 (planificación) si hay features nuevas que no están en el Blueprint
+</code></pre>
+
+<hr>
+
+<h2 id="cheat-sheet-de-comandos-rpidos">Cheat sheet de comandos rápidos</h2>
+
+<table>
+<thead><tr><th>Qué quiero hacer</th><th>Comando / Skill</th></tr></thead>
+<tbody>
+<tr><td>Empezar proyecto desde cero</td><td><code>/forge-check</code> → <code>/plan</code></td></tr>
+<tr><td>Retomar sesión</td><td><code>/avivar</code> (carga contexto rápido)</td></tr>
+<tr><td>Construir feature (manual)</td><td><code>/build</code> → elige "Build Manual" → <code>el-yunque</code></td></tr>
+<tr><td>Construir feature (paralelo)</td><td><code>/build</code> → elige "Modo Forja" → <code>la-forja</code></td></tr>
+<tr><td>Microtarea &lt; 5 min</td><td><code>el-tajo</code></td></tr>
+<tr><td>Feature mediana &lt; 30 min</td><td><code>el-golpe</code></td></tr>
+<tr><td>Iterar sobre código existente</td><td><code>/sprint</code></td></tr>
+<tr><td>Auditar antes de deploy</td><td><code>/el-guardian</code></td></tr>
+<tr><td>Calidad web (Lighthouse)</td><td><code>/web-quality</code></td></tr>
+<tr><td>Setup auth</td><td><code>/add-login</code></td></tr>
+<tr><td>Setup pagos</td><td><code>/add-payments</code></td></tr>
+<tr><td>Setup emails</td><td><code>/add-emails</code></td></tr>
+<tr><td>Setup todo SaaS de una</td><td><code>/init-saas</code></td></tr>
+<tr><td>Setup enterprise completo</td><td><code>/enterprise-stack</code></td></tr>
+<tr><td>Ver estado de features</td><td>abrir <code>tasks.html</code> o leer <code>feature_list.json</code></td></tr>
+</tbody></table>
+
+<hr>
+
+<p><em>Forja Playbook — actualizar cuando el flujo personal cambie.</em></p>
+    <hr>
+    <p style="color:var(--text-muted);font-size:0.8rem;text-align:right">
+      Generado 2026-05-12 · fuente <code>PLAYBOOK.md</code>
+    </p>
+  </main>
+</div>
+<script>document.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
+  document.querySelector('.sidebar').classList.toggle('open');
+});
+
+// Highlight active nav item on scroll
+const headings = document.querySelectorAll('main h2[id]');
+const links    = document.querySelectorAll('.sidebar a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector('.sidebar a[href="#'+e.target.id+'"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+headings.forEach(h => obs.observe(h));</script>
+</body>
+</html>

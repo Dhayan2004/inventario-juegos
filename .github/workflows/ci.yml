@@ -1,0 +1,106 @@
+# ci.yml — Entrega validada por CI (A2 · Forge Enterprise)
+#
+# El árbitro INDEPENDIENTE que cierra AP5/AP8: el `exit 0` ya no lo declara el agente en su máquina,
+# lo certifica un runner remoto (GitHub) cuyo `conclusion` el agente no puede fabricar. Reusa la
+# superficie del Makefile de Forja como contrato único — humanos, agente y CI corren LOS MISMOS
+# comandos (sin divergencia local↔CI, AP2). El YAML solo orquesta: checkout → setup-node → deps → make.
+#
+# Configurar como REQUIRED status checks en branch protection de `main`. Fuente: docs/07 Punto 4 §3.a.
+
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-types:
+    name: Layer 1 — Syntax (typecheck + lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: make typecheck
+
+  test:
+    name: Layer 2 — Runtime (unit + integration)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: make test
+
+  build:
+    name: Smoke — build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: make build
+
+  e2e:
+    name: Layer 3 — System (e2e headless + visual diff vs brand.json)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: make e2e
+
+  hooks:
+    name: Gates — hook autotest + plan integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: make test-hooks
+      - name: plan-validate (R17)
+        run: make plan-validate
+
+  payments:
+    name: Gates — payments (webhook rejects forged/replay · PAY-001..008)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Layer 3 — eventos firmados (válido pasa · forjado / replay / secret incorrecto se rechazan)
+        run: |
+          if ls tests/payments/*.test.mjs >/dev/null 2>&1; then
+            for t in tests/payments/*.test.mjs; do node --experimental-strip-types "$t"; done
+          else
+            echo "sin integración de pagos — skip (add-payments no corrió)"
+          fi
+      - name: payments-gate (PAY-001..008 del threat-db, D-038)
+        run: |
+          if [ -d src/app/api/webhooks ] && [ -f .claude/skills/add-payments/tests/payments-gate.sh ]; then
+            bash .claude/skills/add-payments/tests/payments-gate.sh src/
+          else
+            echo "sin webhooks de pago — skip"
+          fi
+
+  preflight:
+    name: Bootstrap Contract (R11)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: make preflight

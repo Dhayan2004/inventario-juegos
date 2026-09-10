@@ -1,0 +1,19 @@
+# Issue chooser de Forge Enterprise (S2 · Equipos GitHub-native).
+#
+# blank_issues_enabled: false — en una fábrica agentic los Issues NO son la fuente de verdad del build:
+# la VERDAD vive en feature_list.json (R18, espejo de una sola vía). Las features se crean desde el harness
+# (/capataz proyecta feature_list.json → Issues), no a mano. Por eso forzamos un formulario tipado y
+# apuntamos a /capataz para crear features de build.
+# Doctrina: ../../.claude/skills/el-capataz/references/github-native.md §7.
+# Citation: [memory:CONSTRAINTS.md#R18].
+blank_issues_enabled: false
+contact_links:
+  - name: Crear una feature de build (el flujo correcto)
+    url: https://github.com/anthropics/claude-code
+    about: >
+      Las features de build NO se crean a mano en GitHub. Corré /capataz en el harness: proyecta
+      feature_list.json → Issues (una sola vía, R18). Un Issue cerrado NO marca passing — lo gobiernan los hooks.
+  - name: Reportar un problema de seguridad (privado)
+    url: https://github.com/security/advisories
+    about: >
+      No abras un Issue público para vulnerabilidades. Usá un Security Advisory privado o avisá al owner del repo.

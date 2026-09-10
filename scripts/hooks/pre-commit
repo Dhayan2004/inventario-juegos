@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+# Forja pre-commit hook
+# Enforces:
+#   R1  — WIP=1 (only one feature in state "active" in feature_list.json)
+#   R15 — No secrets in commits (fail-closed secrets scan over staged files)
+#   R17 — Plan integrity (fail-closed if .plan/plan.json is invalid/inconsistent)
+#   AP8 — No feature → passing without ci_run.conclusion == success (fail-closed, when CI configured)
+#
+# R5 lives in commit-msg (the only hook that reliably sees the actual
+# commit message). pre-commit runs BEFORE git writes -m text to
+# COMMIT_EDITMSG, so any R5 check here would read a stale message
+# from the previous commit. See D-003.
+#
+# Source: forja/CONSTRAINTS.md
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+FEATURE_LIST="$REPO_ROOT/feature_list.json"
+
+# ─── R1: WIP=1 ───────────────────────────────────────────────────────────────
+if [[ -f "$FEATURE_LIST" ]]; then
+  ACTIVE_COUNT=$(grep -c '"state": "active"' "$FEATURE_LIST" 2>/dev/null || echo 0)
+  ACTIVE_COUNT=${ACTIVE_COUNT//[[:space:]]/}
+
+  if [[ "$ACTIVE_COUNT" -gt 1 ]]; then
+    echo "❌ R1 violación: WIP=1 — hay $ACTIVE_COUNT features en estado 'active' en feature_list.json" >&2
+    echo "" >&2
+    echo "Solo una feature puede estar 'active' simultáneamente." >&2
+    echo "Features actualmente active:" >&2
+    awk '/"id"/{id=$0} /"state": "active"/{print "  " id}' "$FEATURE_LIST" >&2
+    echo "" >&2
+    echo "Mover las extras a 'queued' o 'blocked' antes de commitear." >&2
+    echo "Source: CONSTRAINTS.md R1 (walkinglabs L07)" >&2
+    exit 1
+  fi
+fi
+
+# ─── R15: secrets fail-closed ────────────────────────────────────────────────
+# Bloquea el commit si detecta secrets hardcodeados en archivos staged. A diferencia
+# del security-scan.sh de Forge Pro (fail-OPEN), este es fail-CLOSED: un secret detectado
+# ABORTA el commit. Warnings (CORS/innerHTML/console con datos sensibles) avisan, no bloquean.
+# La tooling de seguridad (que documenta patrones de secrets) se excluye para no auto-bloquearse.
+# Fuente: threat-db.yaml (entradas automated:true) + CONSTRAINTS.md R15.
+STAGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
+SECRETS=""
+WARNINGS=""
+if [[ -n "$STAGED" ]]; then
+  while IFS= read -r file; do
+    [[ -z "$file" ]] && continue
+    case "$file" in
+      *.lock|*.png|*.jpg|*.jpeg|*.ico|*.webp|*.woff*|*.ttf|*.eot|*.svg|*.pdf|node_modules/*|.git/*) continue ;;
+      # tooling/documentación de seguridad: documenta PATRONES de secrets, no los contiene como secrets reales
+      *threat-db.yaml|*hooks/pre-commit|*hooks/security-scan.sh|*hooks/tests/*|*skills/project-auditor/*|*skills/el-guardian/*|*references/security-checklist.md|*references/vibe-coding-risks.md|*CONSTRAINTS.md) continue ;;
+    esac
+    [[ -f "$file" ]] || continue
+    content=$(git show ":$file" 2>/dev/null || true)
+    [[ -z "$content" ]] && continue
+
+    # CRITICAL — secrets (bloquean)
+    if printf '%s' "$content" | grep -qE 'AKIA[0-9A-Z]{16}'; then
+      SECRETS="${SECRETS}  ⛔ AWS Access Key en $file"$'\n'
+    fi
+    # U-14: se extraen los TOKENS y se filtran placeholders de documentación.
+    # D-038: prefijos live de Mercado Pago (APP_USR-…), Lemon Squeezy (lmnsq_) y Wompi (prv_) curados
+    #   del catálogo vendored (add-payments/vendor/pagokit/data/providers.json · secret_key_pattern).
+    # OJO: sin `grep -q` a propósito — en BSD grep (macOS) `-q` combinado con `-v`
+    # sale en la primera línea y devuelve 1 aunque haya una llave real más abajo.
+    real_keys=$(printf '%s' "$content" \
+      | grep -oE '(sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{6,}|sk_live_[a-zA-Z0-9]{6,}|sk_test_[a-zA-Z0-9]{6,}|APP_USR-[A-Za-z0-9]{16,}-[0-9]{6,}-[a-z0-9]{16,}-[0-9]+|lmnsq_(test|live)_[A-Za-z0-9_-]{40,}|prv_(test|prod)_[A-Za-z0-9]{20,})' \
+      | grep -vE '(REPLACE|YOUR|EXAMPLE|PLACEHOLDER|CHANGEME|XXX|BQokikJOvBi)' || true)  # BQokikJOvBi = llave de ejemplo de la doc de Stripe/PayMongo (catálogo vendored, D-038)
+    if [[ -n "$real_keys" ]]; then
+      SECRETS="${SECRETS}  ⛔ API key/token en $file"$'\n'
+    fi
+    if printf '%s' "$content" | grep -qEi '(password|secret|api_key|apikey|access_token|private_key)[[:space:]]*[=:][[:space:]]*["'\''][^"'\'']{8,}'; then
+      if ! printf '%s' "$content" | grep -qE '(process\.env|YOUR_|CHANGE_ME|example|placeholder|<.*>|\$\{)'; then
+        SECRETS="${SECRETS}  ⛔ Posible secret hardcodeado en $file"$'\n'
+      fi
+    fi
+    if printf '%s' "$content" | grep -qE 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+'; then
+      case "$file" in
+        *.env*) ;;
+        *) SECRETS="${SECRETS}  ⛔ JWT crudo (posible service key) en $file"$'\n' ;;
+      esac
+    fi
+
+    # WARNINGS (no bloquean)
+    if printf '%s' "$content" | grep -qEi 'console\.(log|debug|info)\(.*(password|token|secret|key|credential|auth|session)'; then
+      WARNINGS="${WARNINGS}  ⚠️  console con dato sensible en $file"$'\n'
+    fi
+    if printf '%s' "$content" | grep -qE "Access-Control-Allow-Origin.*['\"]\\*['\"]"; then
+      WARNINGS="${WARNINGS}  ⚠️  CORS wildcard (*) en $file"$'\n'
+    fi
+    if printf '%s' "$content" | grep -q 'dangerouslySetInnerHTML'; then
+      WARNINGS="${WARNINGS}  ⚠️  dangerouslySetInnerHTML en $file — verificá sanitización"$'\n'
+    fi
+  done <<< "$STAGED"
+fi
+
+if [[ -n "$WARNINGS" ]]; then
+  echo "⚠️  Security warnings (no bloquean):" >&2
+  printf '%s' "$WARNINGS" >&2
+fi
+
+if [[ -n "$SECRETS" ]]; then
+  echo "❌ R15 violación: secrets hardcodeados en archivos staged (fail-closed):" >&2
+  printf '%s' "$SECRETS" >&2
+  echo "" >&2
+  echo "Usá variables de entorno (process.env / .env gitignored). NO commitees secrets." >&2
+  echo "Si es FALSO POSITIVO, ajustá el patrón o excluí el archivo en el hook." >&2
+  echo "Source: CONSTRAINTS.md R15 (threat-db automated:true)" >&2
+  exit 1
+fi
+
+# ─── R19: el humano es dueño del SPEC — spec y código no se mezclan ──────────
+# Un commit que toca el spec (SPEC.md/CONTEXT.md/docs/adr/**) no puede tocar además
+# código de aplicación: el spec cambia en su propio commit atómico (trazabilidad del
+# contrato). Degradación segura: sin spec staged, no aplica.
+if [[ -n "$STAGED" ]]; then
+  R19_SPEC=$(printf '%s\n' "$STAGED" | grep -E '^(SPEC\.md|CONTEXT\.md|docs/adr/)' || true)
+  R19_CODE=$(printf '%s\n' "$STAGED" | grep -E '^(src/|app/|lib/|components/|supabase/|pages/)' || true)
+  if [[ -n "$R19_SPEC" && -n "$R19_CODE" ]]; then
+    echo "❌ R19 violación: el commit mezcla spec con código de aplicación." >&2
+    echo "" >&2
+    echo "Spec staged:" >&2
+    printf '%s\n' "$R19_SPEC" | sed 's|^|  |' >&2
+    echo "Código staged:" >&2
+    printf '%s\n' "$R19_CODE" | head -5 | sed 's|^|  |' >&2
+    echo "" >&2
+    echo "El humano es dueño del SPEC; la IA es dueña del código. El spec cambia en su" >&2
+    echo "propio commit (type|scope spec), nunca de paso durante el build." >&2
+    echo "Source: CONSTRAINTS.md R19" >&2
+    exit 1
+  fi
+fi
+
+# ─── R17: plan integrity (fail-closed) ───────────────────────────────────────
+# El plano de control nunca se commitea roto. Degradación segura: si no hay .plan/, se salta.
+# Bloquea si plan.json no parsea, o si un post-commit previo marcó el plano inconsistente.
+PLAN_DIR="$REPO_ROOT/.plan"
+if [[ -d "$PLAN_DIR" ]]; then
+  if [[ -f "$PLAN_DIR/.inconsistent" ]]; then
+    echo "❌ R17 violación: el plano de control quedó marcado inconsistente por un post-commit previo." >&2
+    echo "Revisá .plan/plan.json y .plan/activity.log.jsonl; corré 'make plan-validate'. Source: CONSTRAINTS.md R17." >&2
+    exit 1
+  fi
+  if [[ -f "$PLAN_DIR/plan.json" ]]; then
+    if ! node -e 'const p=require(process.argv[1]); if(!p.project||!Array.isArray(p.phases)) process.exit(2)' "$PLAN_DIR/plan.json" 2>/dev/null; then
+      echo "❌ R17 violación: .plan/plan.json no parsea o le falta project/phases (fail-closed)." >&2
+      echo "Arreglá el JSON antes de commitear. Source: CONSTRAINTS.md R17." >&2
+      exit 1
+    fi
+  fi
+fi
+
+# ─── AP8: no feature → passing sin CI verde (fail-closed, si hay CI) ──────────
+# Sólo aplica si el proyecto tiene CI configurado (.github/workflows/ci.yml). Compara el
+# feature_list.json staged contra HEAD: una feature que TRANSICIONA a `passing` en este commit debe
+# tener ci_run.conclusion=="success". Degradación segura: sin ci.yml → gobierna solo R7 local.
+if [[ -f "$REPO_ROOT/.github/workflows/ci.yml" && -f "$FEATURE_LIST" ]] && command -v node >/dev/null 2>&1; then
+  if git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -q '^feature_list.json$'; then
+    STAGED_FL=$(git show ":feature_list.json" 2>/dev/null || echo '')
+    HEAD_FL=$(git show "HEAD:feature_list.json" 2>/dev/null || echo '{"features":[]}')
+    AP8_RESULT=$(node -e '
+      let staged;
+      try { staged = JSON.parse(process.argv[1] || "{}"); }
+      catch { process.stdout.write("MALFORMED"); process.exit(0); }   // fail-closed: bad JSON no pasa
+      let head; try { head = JSON.parse(process.argv[2] || "{}"); } catch { head = { features: [] }; }
+      const wasPassing = {};
+      for (const f of (head.features || [])) if (f.state === "passing") wasPassing[f.id] = true;
+      const bad = [];
+      for (const f of (staged.features || [])) {
+        if (f.state === "passing" && !wasPassing[f.id]) {  // nueva transición a passing
+          if (!f.ci_run || f.ci_run.conclusion !== "success") bad.push(f.id);
+        }
+      }
+      if (bad.length) process.stdout.write("BAD:" + bad.join(", "));
+    ' "$STAGED_FL" "$HEAD_FL" 2>/dev/null || echo "NODE_ERR")
+    if [[ "$AP8_RESULT" == "MALFORMED" || "$AP8_RESULT" == "NODE_ERR" ]]; then
+      echo "❌ AP8/R1 (fail-closed): feature_list.json staged no parsea como JSON. Arreglalo antes de commitear." >&2
+      echo "Source: CONSTRAINTS.md AP8 (docs/07 Punto 4)." >&2
+      exit 1
+    fi
+    if [[ "$AP8_RESULT" == BAD:* ]]; then
+      echo "❌ AP8 violación: feature(s) [${AP8_RESULT#BAD:}] pasan a 'passing' sin CI verde." >&2
+      echo "Requieren ci_run.conclusion == \"success\" (corré /verificar-ci). El texto del agente no cuenta." >&2
+      echo "Source: CONSTRAINTS.md AP8 (docs/07 Punto 4)." >&2
+      exit 1
+    fi
+  fi
+fi
+
+exit 0

@@ -1,0 +1,34 @@
+# CODEOWNERS — mapa path → revisores de GitHub (S2 · Equipos GitHub-native)
+#
+# QUIÉN MANTIENE ESTO: `el-capataz` (/capataz) lo REGENERA desde `.forja/team.json` (el roster
+# del equipo: handle de GitHub + rol M6 + áreas) cruzado con los `modules[]` del plano (.plan/plan.json,
+# cada módulo trae su `area`). NO lo edites a mano si el-capataz está activo — el próximo SYNC lo
+# sobrescribe. Edición manual sólo válida en proyectos sin roster (degradación de un solo dev).
+# Doctrina: ../.claude/skills/el-capataz/references/github-native.md §2.
+#
+# REGLAS (de la doctrina):
+#   - El path raíz `*` cae a los `owner`/`admin` del roster (rol M6 — owner/admin/member).
+#   - Áreas SENSIBLES exigen revisor con rol `owner`/`admin` (gobernanza + seguridad + datos).
+#   - Degradación: roster con 1 solo dev ⇒ se nombra a él en `*`; la review de CODEOWNERS se
+#     desactiva en branch protection cuando hay <2 colaboradores (ver protect-branch.sh §CODEOWNER_REVIEWS).
+#
+# Citation: [memory:CONSTRAINTS.md#R18] (GitHub es un espejo de una sola vía — esto NO escribe estado de build).
+#
+# Reemplaza @owner por el handle real de GitHub del owner del roster (`.forja/team.json` → members[].github).
+# Los handles llevan `@`. Las áreas con varios dueños se separan por espacios: `path  @a @b`.
+
+# ─── Default: todo el repo cae al owner ────────────────────────────────────────
+*                       @owner
+
+# ─── Áreas sensibles: exigen revisor owner/admin ──────────────────────────────
+# Gobernanza del repo y de la fábrica (workflows CI/CD, CODEOWNERS, contrato de reglas).
+/.github/               @owner
+/CONSTRAINTS.md         @owner
+/.claude/               @owner
+
+# Esquema de datos: toda migración toca el contrato multi-tenant (R16) y el aislamiento RLS.
+**/migrations/          @owner
+
+# Superficies de seguridad: auth y pagos manejan credenciales, sesiones y dinero.
+**/api/auth/            @owner
+**/api/payments/        @owner

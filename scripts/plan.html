@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plano de control · Forge Enterprise</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121723; --panel2:#0e1320; --border:#222a3a; --txt:#e6ebf5; --mut:#8b97ad;
+    --done:#10b981; --prog:#fbbf24; --pend:#6b7280; --blok:#ef4444; --accent:#6ea0ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  h1{font-size:26px;margin:2px 0;background:linear-gradient(90deg,#fff,#9fb2f0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .eyebrow{color:var(--mut);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .breadcrumb{margin-top:8px;color:var(--mut);font-size:13px}
+  .breadcrumb b{color:var(--accent)}
+  .btn{background:var(--panel);border:1px solid var(--border);color:var(--txt);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px}
+  .btn:hover{border-color:var(--accent)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .banner{margin:18px 0;border:1px solid var(--blok);background:rgba(239,68,68,.08);border-radius:10px;padding:12px 14px}
+  .banner h3{margin:0 0 6px;font-size:13px;color:var(--blok)}
+  .blk{font-size:13px;margin:3px 0}
+  .blk .own{color:var(--prog)}
+  .phase{border:1px solid var(--border);background:var(--panel);border-radius:12px;margin:14px 0;overflow:hidden}
+  .phase>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .phase>summary::-webkit-details-marker{display:none}
+  .dot{width:10px;height:10px;border-radius:3px;flex:none}
+  .phase .ttl{font-weight:600}
+  .phase .meta{margin-left:auto;color:var(--mut);font-size:12px}
+  .bar{height:6px;border-radius:4px;background:#1b2230;overflow:hidden;flex:none;width:110px}
+  .bar > i{display:block;height:100%;background:var(--done)}
+  .sub{border-top:1px solid var(--border);padding:6px 16px 12px 30px}
+  .sub > summary{cursor:pointer;padding:8px 0;color:var(--mut);font-size:13px;list-style:none}
+  .sub > summary::-webkit-details-marker{display:none}
+  .story{border:1px solid var(--border);background:var(--panel2);border-radius:10px;padding:10px 12px;margin:8px 0}
+  .story.here{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .story .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sid{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mut)}
+  .here-badge{font-size:11px;color:#0b0e14;background:var(--accent);border-radius:6px;padding:1px 7px;font-weight:700}
+  .as{font-size:13px}
+  .chip{font-size:11px;border:1px solid var(--border);border-radius:20px;padding:1px 9px;color:var(--mut)}
+  .chip.feat{border-color:#2b3a55}
+  .chip.feat.passing{color:var(--done);border-color:var(--done)}
+  .chip.feat.active{color:var(--prog);border-color:var(--prog)}
+  select,.note-in{background:var(--panel);border:1px solid var(--border);color:var(--txt);border-radius:7px;padding:4px 8px;font-size:12px}
+  .acts{margin-left:auto;display:flex;gap:6px}
+  .mini{font-size:11px;padding:3px 8px}
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:18px;align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .side{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:14px;position:sticky;top:20px}
+  .side h3{margin:0 0 10px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+  .ev{border-bottom:1px solid var(--border);padding:7px 0;font-size:12.5px}
+  .ev:last-child{border-bottom:none}
+  .ev .who{font-size:11px;color:var(--mut)}
+  .ev .who.agent{color:#7dd3fc}.ev .who.human{color:#c4b5fd}
+  .dec{border-bottom:1px solid var(--border);padding:8px 0;font-size:12.5px}
+  .dec:last-child{border-bottom:none}
+  .dec .did{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--accent)}
+  .dec.sup{opacity:.55}
+  .dec.sup .dtitle{text-decoration:line-through}
+  .dec .dmeta{font-size:11px;color:var(--mut);margin-top:2px}
+  .side h3 .hbtn{float:right;font-size:11px;padding:2px 8px;margin-top:-3px}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;opacity:0;transition:opacity .2s}
+  .toast.show{opacity:1}
+  .empty{color:var(--mut);padding:30px;text-align:center}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#9fb2f0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Plano de control · Forge Enterprise</div>
+      <h1 id="pname">Cargando…</h1>
+      <div class="breadcrumb" id="crumb"></div>
+    </div>
+    <div class="row">
+      <button class="btn" onclick="addNote('project')">＋ nota</button>
+      <button class="btn" onclick="load()">↻ recargar</button>
+    </div>
+  </header>
+
+  <div id="banner"></div>
+
+  <div class="grid">
+    <main id="tree"><div class="empty">Cargando plano…</div></main>
+    <aside class="side">
+      <h3>Decisiones <button class="btn mini hbtn" onclick="addDecision()">＋ decisión</button></h3>
+      <div id="decisions"><div class="empty">—</div></div>
+      <h3 style="margin-top:18px">Actividad</h3>
+      <div id="activity"><div class="empty">—</div></div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STATUS = {
+  done:{label:'Completado',color:'var(--done)',icon:'✅'},
+  in_progress:{label:'En progreso',color:'var(--prog)',icon:'🟡'},
+  pending:{label:'Pendiente',color:'var(--pend)',icon:'⏳'},
+  blocked:{label:'Bloqueado',color:'var(--blok)',icon:'🔴'},
+}
+let PLAN = null
+
+// escape user/agent-controlled strings before injecting into innerHTML (XSS-safe)
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+
+async function post(ev){
+  const r = await fetch('/api/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ev)})
+  const j = await r.json().catch(()=>({}))
+  if(!r.ok){toast('✗ '+(j.error||r.status));return false}
+  return true
+}
+
+async function load(){
+  try{
+    const [p,a] = await Promise.all([fetch('/api/plan'),fetch('/api/activity')])
+    if(!p.ok){const j=await p.json().catch(()=>({}));document.getElementById('tree').innerHTML='<div class="empty">'+(j.error||'sin plano')+'</div>';return}
+    PLAN = await p.json()
+    renderHeader(); renderBanner(); renderTree(); renderDecisions(); renderActivity(await a.json())
+  }catch(e){ document.getElementById('tree').innerHTML='<div class="empty">El plan-server no responde. Corré <code>make plan</code>.</div>' }
+}
+
+function storyState(plan){ // {done,total} from current statuses
+  let done=0,total=0
+  for(const ph of plan.phases||[])for(const sp of ph.subphases||[])for(const st of sp.stories||[]){total++;if(st.status==='done')done++}
+  return {done,total}
+}
+function phaseProgress(ph){let d=0,t=0;for(const sp of ph.subphases||[])for(const st of sp.stories||[]){t++;if(st.status==='done')d++}return t?Math.round(100*d/t):0}
+
+function renderHeader(){
+  const pr = PLAN.project||{}
+  document.getElementById('pname').textContent = pr.name||'(sin nombre)'
+  const cs = pr.currentStage
+  const s = storyState(PLAN)
+  let c = `${s.done}/${s.total} stories · `
+  if(cs) c += `Estás en <b>${esc(cs.phaseId)||'?'}</b> › <b>${esc(cs.subphaseId)||'?'}</b> › <b>${esc(cs.storyId)||'?'}</b>`
+  else c += 'sin etapa actual fijada'
+  document.getElementById('crumb').innerHTML = c
+}
+
+function renderBanner(){
+  const blk=(PLAN.blockers||[]).filter(b=>b.severity!=='resolved')
+  const el=document.getElementById('banner')
+  if(!blk.length){el.innerHTML='';return}
+  el.innerHTML = `<div class="banner"><h3>⛔ ${blk.length} bloqueador(es) activo(s)</h3>`+
+    blk.map(b=>`<div class="blk">• <b>${esc(b.title)}</b> — dueño: <span class="own">${esc(b.owner)||'?'}</span>${b.affects?.length?` · afecta ${esc(b.affects.join(', '))}`:''}</div>`).join('')+`</div>`
+}
+
+function renderTree(){
+  const tree=document.getElementById('tree')
+  const cs=PLAN.project?.currentStage||{}
+  if(!(PLAN.phases||[]).length){tree.innerHTML='<div class="empty">Sin fases. Definí el plano con <code>/cartografo</code>.</div>';return}
+  tree.innerHTML = (PLAN.phases||[]).map(ph=>{
+    const prog=phaseProgress(ph)
+    const subs=(ph.subphases||[]).map(sp=>{
+      const stories=(sp.stories||[]).map(st=>renderStory(st,cs)).join('')
+      return `<details class="sub" open><summary>${esc(sp.id)} · ${esc(sp.name)}</summary>${stories||'<div class="empty">sin stories</div>'}</details>`
+    }).join('')
+    return `<details class="phase" open><summary>
+        <span class="dot" style="background:${esc(ph.color)||'#3b82f6'}"></span>
+        <span class="ttl">${esc(ph.id)} · ${esc(ph.name)}</span>
+        <span class="bar"><i style="width:${prog}%"></i></span>
+        <span class="meta">${prog}%</span>
+      </summary>${subs||'<div class="sub empty">sin subfases</div>'}</details>`
+  }).join('')
+}
+
+function renderStory(st,cs){
+  const here = cs.storyId===st.id
+  const opts = Object.keys(STATUS).map(k=>`<option value="${k}" ${st.status===k?'selected':''}>${STATUS[k].icon} ${STATUS[k].label}</option>`).join('')
+  const feats = (st._featureStatus||[]).map(f=>`<span class="chip feat ${esc(f.state)}" title="feature_list.json (read-only)">${esc(f.id)}: ${esc(f.state)}</span>`).join('')
+  const id = esc(st.id)  // escaped for safe use in data-* attributes (handlers read dataset, not inline JS)
+  return `<div class="story ${here?'here':''}">
+    <div class="top">
+      <span class="sid">${id}</span>
+      ${here?'<span class="here-badge">Estás aquí</span>':''}
+      <span class="as">${st.as?`Como <b>${esc(st.as)}</b> quiero ${esc(st.want)}`:esc(st.title)}</span>
+      <span class="acts">
+        <select data-act="status" data-id="${id}">${opts}</select>
+        <button class="btn mini" data-act="stage" data-id="${id}">📍 etapa</button>
+        <button class="btn mini" data-act="note" data-id="${id}">＋ nota</button>
+      </span>
+    </div>
+    ${feats?`<div class="row" style="margin-top:7px">${feats}</div>`:''}
+  </div>`
+}
+
+// event delegation (no inline handlers with interpolated ids → no JS injection)
+const treeEl = document.getElementById('tree')
+treeEl.addEventListener('change', (e)=>{ const el=e.target.closest('[data-act="status"]'); if(el) changeStatus(el.dataset.id, el.value) })
+treeEl.addEventListener('click', (e)=>{ const el=e.target.closest('[data-act]'); if(!el) return; const a=el.dataset.act; if(a==='stage') markStage(el.dataset.id); else if(a==='note') addNote(el.dataset.id) })
+
+function renderDecisions(){
+  const el=document.getElementById('decisions')
+  const ds=PLAN.decisions||[]
+  if(!ds.length){el.innerHTML='<div class="empty">sin decisiones registradas</div>';return}
+  // vigentes primero (más recientes arriba), superseded al final
+  const ord=[...ds].sort((a,b)=>(a.status==='superseded')-(b.status==='superseded')||String(b.date||'').localeCompare(String(a.date||'')))
+  el.innerHTML = ord.map(d=>{
+    const sup=d.status==='superseded'
+    const affects=(d.affects||[]).length?` · afecta ${esc(d.affects.join(', '))}`:''
+    const adr=d.adrRef?` · <code title="ADR">${esc(d.adrRef)}</code>`:''
+    return `<div class="dec ${sup?'sup':''}" title="${esc(d.rationale||'')}">
+      <span class="did">${esc(d.id)}</span> <span class="dtitle">${esc(d.title)}</span>
+      ${sup?'':`<button class="btn mini" data-dact="supersede" data-id="${esc(d.id)}" title="marcar superseded" style="float:right">↺</button>`}
+      <div class="dmeta">${esc(d.date)||'?'}${affects}${adr}${sup?` · superseded${d.supersededBy?` por <b>${esc(d.supersededBy)}</b>`:''}`:''}</div>
+    </div>`
+  }).join('')
+}
+document.getElementById('decisions').addEventListener('click',(e)=>{
+  const el=e.target.closest('[data-dact="supersede"]'); if(el) supersedeDecision(el.dataset.id)
+})
+async function addDecision(){
+  const id=prompt('ID de la decisión (ej: D-001):'); if(!id)return
+  const title=prompt('Decisión (título corto):'); if(!title)return
+  const rationale=prompt('Por qué (1-2 líneas, opcional):')||''
+  if(await post({actor:'human',type:'decision_add',target:id,decision:{id,title,rationale}})){toast('decisión registrada');load()}
+}
+async function supersedeDecision(id){
+  const by=prompt(`¿Qué decisión reemplaza a ${id}? (ID nuevo, vacío = solo retirar):`)
+  if(by===null)return
+  if(await post({actor:'human',type:'decision_supersede',target:id,by:by||null})){toast('decisión actualizada');load()}
+}
+
+function renderActivity(events){
+  const el=document.getElementById('activity')
+  if(!events?.length){el.innerHTML='<div class="empty">sin actividad</div>';return}
+  el.innerHTML = events.slice(-40).reverse().map(e=>{
+    const t=esc((e.ts||'').replace('T',' ').slice(5,16))
+    const tgt=esc(e.target), actor=e.actor==='agent'?'agent':'human'
+    let line = esc(e.type)
+    if(e.type==='status_change') line=`${tgt}: ${esc(e.from)||'?'} → ${esc(e.to)}`
+    else if(e.type==='note') line=`📝 ${esc(e.body)}`
+    else if(e.type==='stage_change') line=`📍 etapa → ${esc(e.to&&e.to.storyId||e.target)}`
+    else if(e.type==='link') line=`🔗 ${esc(e.label||e.url)}`
+    else if(e.type==='test_result') line=`🧪 ${tgt}: ${esc(e.result)}`
+    else if(e.type==='playwright') line=`📸 ${tgt}: ${esc(e.label)}`
+    else if(e.type==='decision_add') line=`⚖️ ${esc(e.decision&&e.decision.id||tgt)}: ${esc(e.decision&&e.decision.title||'')}`
+    else if(e.type==='decision_supersede') line=`⚖️ ${tgt} superseded${e.by?` por ${esc(e.by)}`:''}`
+    else line=`${esc(e.type)} · ${tgt}`
+    const sealed = e.commit?` · <code title="commit">${esc(String(e.commit).slice(0,7))}</code>`:''
+    return `<div class="ev"><div class="who ${actor}">${actor==='agent'?'🤖':'👤'} ${actor} · ${t}${sealed}</div>${line}</div>`
+  }).join('')
+}
+
+async function changeStatus(storyId,to){
+  if(await post({actor:'human',type:'status_change',target:storyId,to})){toast('estado actualizado');load()}
+}
+async function markStage(storyId){
+  // find the phase/subphase of this story for the breadcrumb
+  let ph,sp
+  for(const p of PLAN.phases||[])for(const s of p.subphases||[])for(const st of s.stories||[])if(st.id===storyId){ph=p.id;sp=s.id}
+  if(await post({actor:'human',type:'stage_change',target:'project',to:{phaseId:ph,subphaseId:sp,storyId}})){toast('etapa actual fijada');load()}
+}
+async function addNote(target){
+  const body=prompt(target==='project'?'Nota del proyecto:':`Nota para ${target}:`)
+  if(!body)return
+  if(await post({actor:'human',type:'note',target,body})){toast('nota guardada');load()}
+}
+
+load()
+</script>
+</body>
+</html>

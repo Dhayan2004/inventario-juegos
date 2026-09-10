@@ -1,0 +1,22 @@
+// .forja/team.json — Roster del equipo de desarrollo (S2 · el-capataz)
+//
+// Fuente ÚNICA de quién es quién. Vive en .forja/ (versionado en git). NO es secreto:
+// solo contiene handles públicos de GitHub + roles + áreas — NUNCA tokens ni credenciales (R15).
+// el-capataz lo CONSUME para regenerar .github/CODEOWNERS y armar branch protection (roster-aware).
+//
+// Shape (references/github-native.md §5):
+//   name   = mismo identificador que el `actor` del plano (A1) — admite el `name` de un miembro además de `agent`.
+//   github = handle de GitHub para CODEOWNERS / approvals.
+//   role   = rol M6 reusado (owner | admin | member) — NO se inventa otro modelo (github-native.md §4).
+//   areas  = áreas de modules[].area de plan.json que esta persona posee (para CODEOWNERS). "*" = todo.
+//
+// Degradación: si este archivo falta, el-capataz INIT lo crea con un solo `owner` derivado de
+// `git config user.name` + el owner del remote. Edítalo a mano para agregar el resto del equipo.
+//
+// NOTA: el comentario de cabecera es JSONC; quita los // si tu parser exige JSON estricto.
+{
+  "schema_version": "1.0.0",
+  "members": [
+    { "name": "owner-name", "github": "YOUR_GH_HANDLE", "role": "owner", "areas": ["*"] }
+  ]
+}

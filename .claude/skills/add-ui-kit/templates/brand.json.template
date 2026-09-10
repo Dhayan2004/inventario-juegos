@@ -1,0 +1,232 @@
+{
+  "$schema_source": "[memory:references#R-005] — .claude/references/BRAND_DNA_SCHEMA.md",
+  "$generated_by": "add-ui-kit ({{ mode }} mode, {{ baseline_preset }} preset baseline)",
+  "$generated_at": "{{ generated_at_iso }}",
+  "schema_version": "1.1.0",
+  "brand": {
+    "name": "{{ brand.name }}",
+    "product": "{{ brand.product }}",
+    "tagline": "{{ brand.tagline }}",
+    "positioning": "{{ brand.positioning }}",
+    "category": "{{ brand.category }}",
+    "audience": [
+      "{{ brand.audience[0] }}",
+      "{{ brand.audience[1] | optional }}",
+      "{{ brand.audience[2] | optional }}",
+      "{{ brand.audience[3] | optional }}"
+    ]
+  },
+  "archetype": {
+    "primary": "{{ archetype.primary }}",
+    "secondary": "{{ archetype.secondary | optional }}",
+    "controlled_tension": "{{ archetype.controlled_tension | optional }}",
+    "shadow_to_avoid": [
+      "{{ archetype.shadow_to_avoid[0] }}",
+      "{{ archetype.shadow_to_avoid[1] | optional }}"
+    ],
+    "ui_translation": "{{ archetype.ui_translation }}",
+    "copy_translation": "{{ archetype.copy_translation }}",
+    "allowed_behaviors": [
+      "{{ archetype.allowed_behaviors[0] }}",
+      "{{ archetype.allowed_behaviors[1] | optional }}",
+      "{{ archetype.allowed_behaviors[2] | optional }}"
+    ],
+    "forbidden_behaviors": [
+      "{{ archetype.forbidden_behaviors[0] }}",
+      "{{ archetype.forbidden_behaviors[1] | optional }}",
+      "{{ archetype.forbidden_behaviors[2] | optional }}"
+    ]
+  },
+  "visual_posture": {
+    "density": {{ posture.density }},
+    "expression": {{ posture.expression }},
+    "geometry": {{ posture.geometry }},
+    "warmth": {{ posture.warmth }},
+    "editoriality": {{ posture.editoriality }},
+    "materiality": {{ posture.materiality }}
+  },
+  "tokens": {
+    "colors": {
+      "primary": "{{ tokens.colors.primary }}",
+      "primary_deep": "{{ tokens.colors.primary_deep }}",
+      "primary_accessible_on_dark": "{{ tokens.colors.primary_accessible_on_dark | optional }}",
+      "primary_accessible_on_light": "{{ tokens.colors.primary_accessible_on_light | optional }}",
+      "accent": "{{ tokens.colors.accent }}",
+      "secondary": "{{ tokens.colors.secondary | optional }}",
+      "background": "{{ tokens.colors.background | optional }}",
+      "surface": "{{ tokens.colors.surface }}",
+      "surface_elevated": "{{ tokens.colors.surface_elevated }}",
+      "surface_higher": "{{ tokens.colors.surface_higher | optional }}",
+      "border": "{{ tokens.colors.border }}",
+      "text": "{{ tokens.colors.text }}",
+      "text_muted": "{{ tokens.colors.text_muted }}",
+      "text_subtle": "{{ tokens.colors.text_subtle }}",
+      "success": "{{ tokens.colors.success }}",
+      "danger": "{{ tokens.colors.danger }}",
+      "warning": "{{ tokens.colors.warning }}",
+      "info": "{{ tokens.colors.info | optional }}"
+    },
+    "typography": {
+      "display": {
+        "family": "{{ tokens.typography.display.family }}",
+        "weights": {{ tokens.typography.display.weights }},
+        "use_for": {{ tokens.typography.display.use_for }}
+      },
+      "body": {
+        "family": "{{ tokens.typography.body.family }}",
+        "weights": {{ tokens.typography.body.weights }},
+        "line_height": {{ tokens.typography.body.line_height }}
+      },
+      "mono": {
+        "family": "{{ tokens.typography.mono.family | optional }}",
+        "use_for": {{ tokens.typography.mono.use_for | optional }},
+        "avoid_for": {{ tokens.typography.mono.avoid_for | optional }}
+      }
+    },
+    "shape": {
+      "radius_sm": {{ tokens.shape.radius_sm }},
+      "radius_md": {{ tokens.shape.radius_md }},
+      "radius_lg": {{ tokens.shape.radius_lg }},
+      "border_width": {{ tokens.shape.border_width }}
+    },
+    "spacing": {
+      "unit": {{ tokens.spacing.unit }},
+      "section_y": {
+        "sm": {{ tokens.spacing.section_y.sm }},
+        "md": {{ tokens.spacing.section_y.md }},
+        "lg": {{ tokens.spacing.section_y.lg }}
+      },
+      "component_gap": {
+        "xs": {{ tokens.spacing.component_gap.xs }},
+        "sm": {{ tokens.spacing.component_gap.sm }},
+        "md": {{ tokens.spacing.component_gap.md }},
+        "lg": {{ tokens.spacing.component_gap.lg }}
+      }
+    }
+  },
+  "component_rules": {
+    "button": {
+      "variants": ["primary", "secondary", "ghost", "danger"],
+      "rules": [
+        "Only one primary action per view section",
+        "No diagonal gradients",
+        "Focus, hover, active, disabled and loading states required",
+        "Icon must clarify the action"
+      ]
+    },
+    "card": {
+      "variants": ["default", "interactive", "metric", "empty"],
+      "rules": [
+        "No nested cards",
+        "Use border or surface before heavy shadow in dark UI",
+        "Card must group, compare, execute or reveal"
+      ]
+    },
+    "form": {
+      "variants": ["text", "search", "textarea", "select"],
+      "rules": [
+        "Visible label by default",
+        "Error message must be textual and near the field",
+        "Focus state must be visible",
+        "Mobile tap targets minimum 44px"
+      ]
+    },
+    "navigation": {
+      "variants": ["sidebar", "topbar", "tabs", "breadcrumb"],
+      "rules": [
+        "Active state must be unambiguous",
+        "Do not hide critical navigation for aesthetics",
+        "Mobile behavior must be defined"
+      ]
+    },
+    "modal": {
+      "variants": ["confirm", "form", "detail"],
+      "rules": [
+        "Contextual title required",
+        "Escape/cancel behavior required",
+        "Destructive actions require explicit confirmation",
+        "Focus trap required"
+      ]
+    }
+  },
+  "hero_layout": "{{ hero_layout | default: 'authored' }}",
+  "signature_element": "{{ signature_element | default: '' }}",
+  "motion": {
+    "safe_props": ["transform", "opacity"],
+    "exit_ratio": {{ motion.exit_ratio | default: 0.75 }},
+    "reduce_motion_default": {{ motion.reduce_motion_default | default: true }},
+    "parallax_max_layers": {{ motion.parallax_max_layers | default: 2 }},
+    "personality": {
+      "energy": "{{ motion.energy }}",
+      "elasticity": "{{ motion.elasticity }}",
+      "directionality": "{{ motion.directionality }}",
+      "sequencing": "{{ motion.sequencing }}",
+      "distance": "{{ motion.distance }}",
+      "restraint": "{{ motion.restraint }}"
+    },
+    "durations_ms": {
+      "instant": {{ motion.durations.instant }},
+      "fast": {{ motion.durations.fast }},
+      "base": {{ motion.durations.base }},
+      "slow": {{ motion.durations.slow }}
+    },
+    "rules": [
+      "Respect prefers-reduced-motion",
+      "No above-fold fade-in longer than 300ms",
+      "No bounce unless explicitly declared",
+      "Avoid layout-shifting animation"
+    ]
+  },
+  "anti_slop": {
+    "forbidden_colors": ["#6366F1", "#8B5CF6", "#A855F7"],
+    "restricted_hues": [
+      {
+        "name": "default_ai_purple_blue",
+        "hue_range": [235, 285],
+        "allowed_only_if": ["brand_declares_purple_as_primary", "archetype_primary_is_magician"]
+      }
+    ],
+    "forbidden_patterns": {{ anti_slop.forbidden_patterns }}
+  },
+  "contexts": {
+    "web_app": {
+      "density": "{{ contexts.web_app.density | default: 'balanced' }}",
+      "motion": "{{ contexts.web_app.motion | default: 'crisp' }}",
+      "navigation": "{{ contexts.web_app.navigation | default: 'full' }}"
+    },
+    "mobile_native": {
+      "density": "{{ contexts.mobile_native.density | default: 'slightly_spacious' }}",
+      "tap_target_min": {{ contexts.mobile_native.tap_target_min | default: 44 }},
+      "navigation": "{{ contexts.mobile_native.navigation | default: 'platform_native' }}"
+    },
+    "vertical_video": {
+      "contrast": "higher",
+      "type_scale": "larger",
+      "safe_area": true,
+      "copy": "shorter"
+    },
+    "pitch_slides": {
+      "editoriality": "higher",
+      "density": "lower"
+    },
+    "transactional_email": {
+      "motion": "none",
+      "fallback_fonts": ["Arial", "Helvetica"],
+      "layout": "single_column_first"
+    }
+  },
+  "validation": {
+    "min_contrast_body": 4.5,
+    "min_contrast_large": 3,
+    "max_fonts": {{ validation.max_fonts | default: 2 }},
+    "max_radius_values": {{ validation.max_radius_values | default: 3 }},
+    "max_primary_color_usage_percent": {{ validation.max_primary_color_usage_percent | default: 18 }},
+    "brand_score_weights": {
+      "accessibility": 30,
+      "token_compliance": 25,
+      "component_compliance": 20,
+      "anti_slop": 15,
+      "voice_and_archetype": 10
+    }
+  }
+}
