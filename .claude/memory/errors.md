@@ -314,3 +314,29 @@ Casos concretos:
 
 ---
 
+## E-010 — F2-01 build roto tras add-ui-kit: alias import, Tailwind 4 vs 3, y `$` literal en comentario que el JIT scanner intentó resolver
+
+**Date:** 2026-09-11
+**Status:** closed — verificado en verde (typecheck, lint, brand:validate, build) tras el fix, sin cambios a `brand.json`/`voice.json`/`brand.css` (tokens intactos).
+
+**Context:** F2-01 (Brand DNA, `chore/brand-dna`) había quedado marcado `passing` en `feature_list.json`, pero el build de la app (`npm run build`) fallaba. Root cause: tres fallas independientes introducidas al generar el showcase de `add-ui-kit` sobre un `package.json` que ya fijaba `tailwindcss ^3.4.0`.
+
+**Root cause exacto (3 fallas independientes):**
+1. **Alias `@/` roto en import de CSS.** `src/app/(brand)/showcase/page.tsx` importaba `@/brand/brand.css`, pero el alias `@/*` del `tsconfig.json` mapea a `./src/*` — `brand/` vive fuera de `src/`, así que el alias nunca resolvía ahí. El bundler (Turbopack/Next 16) fallaba al no encontrar el módulo.
+2. **`globals.css` en sintaxis Tailwind 4** (`@import 'tailwindcss'`) **contra `tailwindcss ^3.4.0` instalado.** La sintaxis de import single-line es Tailwind 4; v3 requiere las tres directivas `@tailwind base/components/utilities`. Mismatch de versión entre el snippet generado (asumió v4) y la dependencia real del proyecto.
+3. **Comentario en `sections/toast.tsx` con patrón bracket-literal `${token}`** que el scanner JIT de Tailwind (Lightning CSS vía Turbopack) interpretó como clase arbitraria con `$` sin resolver, y crasheaba en vez de ignorarlo como prosa. El scanner de Tailwind no distingue comentario de código — cualquier string que *parezca* una className arbitraria (`[...]` o con `$`) dentro del archivo escaneado es candidata a intentar resolverse.
+
+**Fix:**
+1. Import corregido a ruta relativa `../../../../brand/brand.css` (alias `@/*` no cubre nada fuera de `src/`).
+2. `globals.css` migrado a `@tailwind base; @tailwind components; @tailwind utilities;` (sintaxis v3, matchea `tailwindcss ^3.4.0` en `package.json`).
+3. Comentario de `toast.tsx` reescrito sin el patrón bracket-literal (`${token}`) — mismo significado, sin token que el scanner JIT intente resolver.
+
+**Prevención (para próximos proyectos con add-ui-kit):**
+- El alias `@/*` de Next.js apunta a `src/`, NUNCA asumir que cubre `brand/` u otras carpetas top-level — imports hacia `brand/` desde dentro de `src/app/` van con ruta relativa o un alias nuevo explícito.
+- Antes de generar cualquier snippet de import CSS de Tailwind, LEER la versión real en `package.json` (`tailwindcss` v3 vs v4 tienen sintaxis de entrada incompatible) — no asumir v4 por default solo porque es la más reciente en docs.
+- En archivos que el scanner JIT de Tailwind escanea (cualquier `.tsx` bajo `src/`), evitar escribir en comentarios/prosa patrones que parezcan className arbitraria (`${...}`, `[...]`) aunque nunca se rendericen como clase — el scanner es léxico, no semántico.
+
+**Cita:** `[memory:errors#E-010]`
+
+---
+
