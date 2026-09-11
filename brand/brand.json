@@ -1,0 +1,234 @@
+{
+  "$schema_source": "[memory:references#R-005] — .claude/references/BRAND_DNA_SCHEMA.md",
+  "$generated_by": "add-ui-kit (FRESH mode, Tech Utility direction baseline)",
+  "$generated_at": "2026-09-10T00:00:00Z",
+  "schema_version": "1.1.0",
+  "brand": {
+    "name": "Inventario de Videojuegos",
+    "product": "Inventario de Videojuegos",
+    "tagline": null,
+    "positioning": null,
+    "category": "App personal de catálogo de juegos — herramienta interna de gestión de inventario/colección de videojuegos",
+    "audience": ["Equipo pequeño (staff interno)"]
+  },
+  "archetype": {
+    "primary": "Creator",
+    "secondary": "Explorer",
+    "shadow_to_avoid": ["Magician", "Hero"],
+    "ui_translation": "grids precisos, mono fonts en accents técnicos, herramientas visibles, motion mecánico (no mágico), espacio para trabajo en curso",
+    "copy_translation": "énfasis en proceso/oficio, vocabulario técnico fluido, evitar buzzwords abstractos; toque de descubrimiento al navegar el catálogo",
+    "allowed_behaviors": [
+      "mostrar el proceso/herramientas de gestión del inventario",
+      "usar vocabulario técnico con fluidez (SKU, stock, condición)",
+      "motion mecánico y directo, nunca ceremonial"
+    ],
+    "forbidden_behaviors": [
+      "\"AI magic\" sin sustancia o gradientes decorativos sin función",
+      "grandilocuencia tipo \"ranked #1\" o métricas infladas",
+      "automatización que oculta el proceso de gestión al staff"
+    ]
+  },
+  "visual_posture": {
+    "density": 4,
+    "expression": 2,
+    "geometry": 4,
+    "warmth": 2,
+    "editoriality": 1,
+    "materiality": 1
+  },
+  "tokens": {
+    "colors": {
+      "primary": "#299236",
+      "primary_deep": "#1D6B29",
+      "primary_accessible_on_dark": "#4ADE80",
+      "primary_accessible_on_light": "#1D6B29",
+      "accent": "#299236",
+      "secondary": "#64748B",
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "surface_elevated": "#F8FAFC",
+      "border": "#E2E8F0",
+      "text": "#1C2430",
+      "text_muted": "#64748B",
+      "text_subtle": "#94A3B8",
+      "success": "#16A34A",
+      "danger": "#DC2626",
+      "warning": "#D97706",
+      "info": "#2563EB"
+    },
+    "typography": {
+      "display": {
+        "family": "Geist",
+        "weights": [600, 700],
+        "use_for": ["page_titles", "section_headlines"]
+      },
+      "body": {
+        "family": "Geist",
+        "weights": [400, 500, 600],
+        "line_height": 1.5
+      },
+      "mono": {
+        "family": "Geist Mono",
+        "use_for": ["code", "technical_labels", "metadata", "table_numerics"],
+        "avoid_for": ["body", "headlines"]
+      }
+    },
+    "shape": {
+      "radius_sm": 4,
+      "radius_md": 6,
+      "radius_lg": 10,
+      "border_width": 1
+    },
+    "spacing": {
+      "unit": 4,
+      "section_y": { "sm": 40, "md": 64, "lg": 96 },
+      "component_gap": { "xs": 4, "sm": 8, "md": 12, "lg": 16 }
+    }
+  },
+  "component_rules": {
+    "button": {
+      "variants": ["primary", "secondary", "ghost", "danger"],
+      "rules": [
+        "Only one primary action per view section",
+        "No diagonal gradients",
+        "Focus, hover, active, disabled and loading states required",
+        "Icon must clarify the action"
+      ]
+    },
+    "card": {
+      "variants": ["default", "interactive", "metric", "empty"],
+      "rules": [
+        "No nested cards",
+        "Use border or surface before heavy shadow in dark UI",
+        "Card must group, compare, execute or reveal"
+      ]
+    },
+    "form": {
+      "variants": ["text", "search", "textarea", "select"],
+      "rules": [
+        "Visible label by default",
+        "Error message must be textual and near the field",
+        "Focus state must be visible",
+        "Mobile tap targets minimum 44px"
+      ]
+    },
+    "navigation": {
+      "variants": ["sidebar", "topbar", "tabs", "breadcrumb"],
+      "rules": [
+        "Active state must be unambiguous",
+        "Do not hide critical navigation for aesthetics",
+        "Mobile behavior must be defined"
+      ]
+    },
+    "modal": {
+      "variants": ["confirm", "form", "detail"],
+      "rules": [
+        "Contextual title required",
+        "Escape/cancel behavior required",
+        "Destructive actions require explicit confirmation",
+        "Focus trap required"
+      ]
+    }
+  },
+  "hero_layout": "authored",
+  "signature_element": "snap de 140ms en botones, filas de tabla y toggles — el feedback mecánico de precisión de una herramienta de oficio",
+  "motion": {
+    "safe_props": ["transform", "opacity"],
+    "exit_ratio": 0.75,
+    "reduce_motion_default": true,
+    "parallax_max_layers": 0,
+    "personality": {
+      "energy": "precise",
+      "elasticity": "snap_not_bounce",
+      "directionality": "mechanical",
+      "sequencing": "subtle_stagger",
+      "distance": "short",
+      "restraint": "high"
+    },
+    "durations_ms": {
+      "instant": 80,
+      "fast": 140,
+      "base": 220,
+      "slow": 320
+    },
+    "rules": [
+      "Respect prefers-reduced-motion",
+      "No above-fold fade-in longer than 300ms",
+      "No bounce unless explicitly declared",
+      "Avoid layout-shifting animation"
+    ]
+  },
+  "anti_slop": {
+    "forbidden_colors": ["#6366F1", "#8B5CF6", "#A855F7"],
+    "restricted_hues": [
+      {
+        "name": "default_ai_purple_blue",
+        "hue_range": [235, 285],
+        "allowed_only_if": ["brand_declares_purple_as_primary", "archetype_primary_is_magician"]
+      }
+    ],
+    "forbidden_patterns": [
+      "Gradiente from #6366F1 to #A855F7 como hero o CTA principal",
+      "Gradiente diagonal azul/morado tipo linear-gradient(135deg, #3B82F6, #8B5CF6)",
+      "Tailwind purple/indigo default como identidad: #8B5CF6, #6366F1, #A855F7",
+      "Fondo blanco + Inter + CTA morado + tres cards centradas",
+      "Glassmorphism: backdrop-blur-xl + border blanco translúcido + blobs",
+      "Blobs decorativos con blur-3xl, especialmente morado/azul/rosa",
+      "Iconos Lucide genéricos en círculos de color sin intención",
+      "Tres feature cards con títulos tipo Fast, Secure, Scalable",
+      "Hero con eyebrow Introducing the future of... sin producto concreto",
+      "Headlines con Build better products faster o equivalente",
+      "Cards con shadow grande: shadow-2xl como default",
+      "Border radius gigante en SaaS serio: rounded-3xl por todas partes",
+      "Botones pill por defecto sin relación con la marca",
+      "Secciones alternando cards flotantes sobre fondos levemente tintados",
+      "Mockups falsos dentro de browser chrome genérico",
+      "Data dashboards con números inventados y gráficas sin labels",
+      "Avatares circulares random para social proof sin fuente real",
+      "Testimonios genéricos sin nombre/cargo verificable",
+      "Animaciones fade-up aplicadas a cada bloque de la página",
+      "Copy con seamless, effortless, unlock, supercharge, next-gen"
+    ]
+  },
+  "contexts": {
+    "web_app": {
+      "density": "balanced",
+      "motion": "crisp",
+      "navigation": "full"
+    },
+    "mobile_native": {
+      "density": "slightly_spacious",
+      "tap_target_min": 44,
+      "navigation": "platform_native"
+    },
+    "vertical_video": {
+      "contrast": "higher",
+      "type_scale": "larger",
+      "safe_area": true,
+      "copy": "shorter"
+    },
+    "pitch_slides": {
+      "editoriality": "higher",
+      "density": "lower"
+    },
+    "transactional_email": {
+      "motion": "none",
+      "fallback_fonts": ["Arial", "Helvetica"],
+      "layout": "single_column_first"
+    }
+  },
+  "validation": {
+    "min_contrast_body": 4.5,
+    "min_contrast_large": 3,
+    "max_fonts": 2,
+    "max_radius_values": 3,
+    "max_primary_color_usage_percent": 18,
+    "brand_score_weights": {
+      "accessibility": 30,
+      "token_compliance": 25,
+      "component_compliance": 20,
+      "anti_slop": 15,
+      "voice_and_archetype": 10
+    }
+  }
+}

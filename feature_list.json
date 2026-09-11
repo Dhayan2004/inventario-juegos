@@ -52,7 +52,7 @@
       "phase": 2,
       "behavior": "El Brand DNA existe: /add-ui-kit con preset Tech Utility produce brand/brand.json + brand/voice.json + brand/brand.css validos contra el schema R-005 (gate R10).",
       "verification": "test -f brand/brand.json && test -f brand/voice.json && npm run brand:validate",
-      "state": "pending",
+      "state": "active",
       "branch": "chore/brand-dna",
       "acceptance": [
         "Los 3 archivos de brand existen",

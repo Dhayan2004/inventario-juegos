@@ -44,6 +44,9 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # IDE
 .vscode
 .idea

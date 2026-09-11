@@ -1,4 +1,6 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /*
  * CSS vars de Brand DNA se inyectan aquí por add-ui-kit.

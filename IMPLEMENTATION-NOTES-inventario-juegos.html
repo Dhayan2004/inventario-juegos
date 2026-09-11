@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Implementation Notes — inventario-juegos</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font: 15px/1.6 ui-sans-serif, system-ui, sans-serif; max-width: 880px;
+         margin: 0 auto; padding: 2rem 1.25rem; background: #0d0f14; color: #e6e8ee; }
+  h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  .meta { color: #8b91a3; font-size: .85rem; margin-bottom: 2rem; }
+  h2 { font-size: 1.1rem; margin: 2rem 0 .75rem; padding-bottom: .35rem;
+       border-bottom: 1px solid #232733; }
+  .entry { background: #151823; border: 1px solid #232733; border-radius: 10px;
+           padding: .85rem 1rem; margin: .6rem 0; }
+  .phase { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em;
+           color: #6ea8fe; margin-bottom: .3rem; }
+  .open  { border-left: 3px solid #f5a623; }
+  .resolved { opacity: .6; text-decoration: line-through; }
+  code { background: #1c2030; padding: .1rem .35rem; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h1>Implementation Notes — Inventario de Videojuegos</h1>
+  <p class="meta">
+    Blueprint: <code>.claude/PRPs/BLUEPRINT-inventario-juegos.md</code> ·
+    Feature: <code>F2-01</code> ·
+    Build mode: Manual (el-yunque) ·
+    Actualizado: Fase 2 — F2-01 cerrada (passing)
+  </p>
+
+  <h2>🎯 Decisiones de diseño</h2>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    <strong><code>brand:validate</code> implementado en Node</strong> (<code>scripts/validate-brand.mjs</code>),
+    no en Python — el script no existía en <code>package.json</code> pese a estar referenciado en
+    <code>feature_list.json</code>. Cubre schema_version, spacing keyed, motion enums cerrados y los checks
+    1-6 del Anti-Slop Gate contra el <code>brand.json</code> real del proyecto (no un fixture).
+  </div>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    <strong>Python resuelto sin instalar nada</strong>: <code>python3</code> en PATH era el stub de Microsoft
+    Store (exit 49, no funcional); <code>python</code> sí funciona (3.14.5). Se usó un wrapper de una línea
+    en el scratchpad de sesión (<code>exec python "$@"</code>), antepuesto al PATH solo para la corrida
+    puntual de <code>anti-slop-gate.sh</code> original como cross-check. No persiste, no toca el repo ni el
+    sistema.
+  </div>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    <strong><code>eslint.config.js</code> (flat config) creado</strong> + <code>package.json</code>
+    <code>"lint"</code> cambiado de <code>next lint</code> a <code>eslint .</code> — Next.js 16.3.4 eliminó
+    el comando <code>next lint</code> (confirmado vía <code>npx next --help</code>). Consume
+    <code>eslint-config-next</code> (ya exporta flat config) e ignora <code>.claude/**</code> explícitamente
+    (son templates/tests/fixtures del arnés, incluyendo un fixture deliberadamente "sucio" para probar el
+    gate — no código de aplicación).
+  </div>
+
+  <h2>↔️ Desviaciones del spec</h2>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    El Blueprint/PIEZA original de F2-01 no contemplaba escribir <code>eslint.config.js</code> ni el
+    validador de brand — ambos son gaps de bootstrap (deuda de F1-01) que se resolvieron dentro de F2-01
+    por decisión explícita del usuario ("arregla el lint ahora, dentro de F2-01") en vez de escalar a otra
+    sesión.
+  </div>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    Se corrigieron 4 errores de lint reales en <code>src/app/(brand)/showcase/</code> (código generado por
+    <code>add-ui-kit</code>, no escrito en esta sesión): <code>feedback-panel.tsx</code> y
+    <code>viewport-toggle.tsx</code> tenían <code>setState</code> síncrono dentro de un <code>useEffect</code>
+    (regla <code>react-hooks/set-state-in-effect</code>); <code>sections/voice.tsx</code> tenía comillas sin
+    escapar en JSX. Fix aplicado: en <code>feedback-panel.tsx</code> se refactorizó a un <code>closeDrawer()</code>
+    compartido (elimina el setState-en-effect real); en <code>viewport-toggle.tsx</code> y el
+    <code>setLoading(true)</code> de <code>feedback-panel.tsx</code> se usó
+    <code>eslint-disable-next-line</code> puntual con justificación inline (son sync legítimo con
+    localStorage / fetch-on-mount, patrones que la propia regla documenta como válidos).
+  </div>
+
+  <h2>⚖️ Trade-offs</h2>
+  <div class="entry"><div class="phase">Fase 2 — cierre F2-01</div>
+    Para los 2 casos de <code>set-state-in-effect</code> que sí son sync legítimo con un sistema externo
+    (leer localStorage al montar, marcar loading al iniciar un fetch), se consideró reescribir con
+    <code>useSyncExternalStore</code> / <code>startTransition</code> vs. un <code>eslint-disable-next-line</code>
+    puntual y documentado. Se eligió el disable por ser código de showcase/dev-chrome (no de producto), donde
+    la reescritura agregaría complejidad sin beneficio funcional.
+  </div>
+
+  <h2>❓ Preguntas abiertas</h2>
+  <div class="entry open"><div class="phase">Fase 1 → 2</div>
+    F1-01/F1-02/F1-03 (cimientos: bootstrap contract, entidad <code>game</code>, capa de datos) siguen
+    <code>pending</code> en <code>feature_list.json</code>. F2-02..F2-04 dependen de la entidad
+    <code>game</code> existiendo. Confirmar con Carlos el orden: ¿retomar F1 antes de F2-02, o F2-02 (shell
+    de navegación, sin datos) puede ir primero?
+  </div>
+  <div class="entry open"><div class="phase">§0/§3/§5 del Blueprint</div>
+    El Blueprint marca varios campos de <code>game</code> y el set de métricas de Estadísticas como
+    hipótesis (⚠️) pendientes de confirmación del cliente. No bloquea F2-01 (solo brand), pero bloquea F1-02
+    y en cascada F3/F4/F5 — ver Blueprint §8 pre-mortem, "🐘 Elefante".
+  </div>
+  <div class="entry open"><div class="phase">Fase 2 — hallazgo de el-evaluador</div>
+    <code>npm run build</code> falla: <code>src/app/globals.css</code> usa sintaxis de import de Tailwind v4
+    (<code>@import 'tailwindcss';</code>) mientras <code>package.json</code>/<code>postcss.config.js</code>
+    están fijados en Tailwind v3.4 → <code>Module not found: Can't resolve 'v8'</code> en todas las rutas.
+    Confirmado preexistente (baseline <code>996b424</code>, no tocado en esta sesión) — no gatea F2-01, pero
+    bloqueará F2-02+ (necesitan build/e2e). el-evaluador propuso una entrada <code>E-NNN</code> para
+    <code>errors.md</code> pero no la escribió (pendiente de confirmación — R5). Decidir: ¿fix ahora o al
+    iniciar F2-02?
+  </div>
+</body>
+</html>

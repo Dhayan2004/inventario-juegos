@@ -1,0 +1,75 @@
+{
+  "$schema_source": "[memory:references#R-005] — .claude/references/BRAND_DNA_SCHEMA.md sección 9.2",
+  "$generated_by": "add-ui-kit (FRESH mode, Tech Utility direction baseline)",
+  "$generated_at": "2026-09-10T00:00:00Z",
+  "schema_version": "1.0.0",
+  "voice": {
+    "name": "Inventario de Videojuegos",
+    "language": "es-419",
+    "language_rules": {
+      "formal_you": "tú",
+      "decimal_separator": ",",
+      "date_format": "DD/MM/YYYY"
+    },
+    "tone_axes": {
+      "directness": 4,
+      "warmth": 3,
+      "technicality": 4,
+      "provocation": 2,
+      "hype": 1
+    },
+    "principles": [
+      "Diagnóstico, no adorno",
+      "Oficio visible sobre marketing",
+      "Claridad de datos antes que estética",
+      "Cada acción, una confirmación clara"
+    ],
+    "vibe": "Un compañero de equipo preciso que te dice exactamente qué hay en stock y qué falta",
+    "audience": "Equipo pequeño (staff interno)",
+    "code_switching": {
+      "allowed": ["SKU", "stock", "backlog", "ship"],
+      "rule": "Anglicismos técnicos sin traducir cuando son parte natural del oficio"
+    },
+    "safe_words": [],
+    "avoid_words": [
+      "revolutionary",
+      "revolucionario",
+      "cutting-edge",
+      "AI-powered como cualidad principal",
+      "best-in-class",
+      "leverage",
+      "synergy",
+      "disrupt",
+      "ecosystem como relleno",
+      "unlock your potential",
+      "Act now",
+      "Limited time",
+      "barato",
+      "fácil",
+      "increíble",
+      "seamless experience",
+      "effortless",
+      "supercharge your workflow",
+      "game-changing",
+      "next-generation",
+      "transform your business",
+      "all-in-one platform",
+      "scale with confidence"
+    ],
+    "sentence_rules": {
+      "prefer": ["Frases cortas", "Verbos concretos", "Diagnóstico antes que promesa"],
+      "avoid": ["Superlativos vacíos", "Promesas absolutas", "Corporate SaaS filler", "Hype de IA mágica"]
+    },
+    "hooks": [
+      "Cada juego en su lugar.",
+      "El inventario no miente.",
+      "Menos buscar, más jugar."
+    ],
+    "cta_style": "Directo, no pushy",
+    "cta_examples": ["Agregar juego", "Ver detalles", "Actualizar stock"],
+    "pacing": {
+      "words_per_minute": 165,
+      "pause_after_hook_ms": 400
+    }
+  }
+}
