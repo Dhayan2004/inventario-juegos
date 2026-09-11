@@ -1954,4 +1954,59 @@ security-pre-handoff 80 (10 gates × 3) · payments-gate 4/4 · pre-commit +1 ca
 `el-guardian` 6 lentes; `ci.yml` 7 jobs. Superficie de comandos/skills: sin cambio (38/37). Ver
 R-012, `docs/11`, `docs/security/VETTING-pagokit-0.2.2.md`.
 
-<!-- D-039 onwards: populated as architectural decisions emerge -->
+---
+
+## D-039 — BaaS de `inventario-juegos` = Supabase (assumed_default, sin Tech Spec formal de la-herreria Fase 3)
+
+**Date:** 2026-09-11
+**Status:** accepted
+
+**Context:** Fase 1 (Cimientos y datos) de `inventario-juegos` necesitaba backend persistente para la
+entidad `game` (F1-02, F1-03) antes de que existiera un Tech Spec formal producido por `la-herreria`
+Fase 3 — este proyecto arrancó directo desde el Blueprint sin pasar por el pipeline completo de
+planificación. El skill `baas` exige una decisión documentada de BaaS antes de que `el-migrador` y la
+capa de acceso a datos puedan avanzar, con fallback explícito para el caso "sin Tech Spec formal"
+([memory:decisions#D-009]).
+
+**Decision:** Supabase, documentada en `.claude/PRPs/TECH-SPEC-inventario-juegos.md` sección
+"BaaS Decision" (2026-09-11). Score Supabase 8 · InsForge 5 (diff 3, decisión cerrada sin
+tie-breaker). Señales decisivas: (1) Supabase ya era el default declarado en el Golden Path de
+`CLAUDE.md` del proyecto ("Backend: Supabase (Auth + PostgreSQL + RLS) | InsForge según Tech Spec");
+(2) el scaffold llegó con `@supabase/supabase-js` + `@supabase/ssr` ya instalados antes de que
+arrancara Fase 1 — no había ninguna señal en contra de cambiar de BaaS; (3) Supabase CLI + Docker
+local permitieron levantar una DB de prueba real (`supabase start`) y probar la migración `up`/`down`
+de F1-02 contra Postgres real en vez de mocks, sin pedirle a Carlos acceso a un proyecto externo
+(evita `[CONSTRAINTS.md#AP1]`). Flag `baas.assumed_default = true` explícito en el TECH-SPEC: aplica
+el fallback documentado en `.claude/skills/baas/SKILL.md` ("Supabase como default cuando no hay Tech
+Spec"), consistente con el precedente de `add-login` ([memory:decisions#D-009]).
+
+**Alternatives considered:**
+- InsForge: puntuó más alto solo en operating mode (agents-primary) y SLA/real-time/edge (ninguno de
+  los cuales aplica — el MVP es CRUD básico sin real-time). Rechazado por el diff de 3 puntos y por
+  desinstalar dependencias ya presentes sin justificación.
+- Halt hasta que `la-herreria` produjera un Tech Spec formal: rechazado por la misma razón que D-009 —
+  fricción alta para un proyecto interno de un solo cliente/revisor; el fallback `assumed_default` con
+  flag explícito preserva trazabilidad sin bloquear Fase 1.
+
+**Consequences:**
+- (+) F1-02 (migración `game`) y F1-03 (capa de acceso a datos) pudieron construirse y verificarse
+  localmente contra Postgres real (Docker) en la misma sesión, sin dependencia externa.
+- (+) RLS deny-all en `game` para `anon`/`authenticated` (L-001 degradado: sin auth en v1, acceso real
+  solo server-side vía `createServiceClient()` con `import "server-only"`) queda alineado con el patrón
+  Supabase ya validado en Forja.
+- (-) La decisión no pasó por el Tech Spec formal de Fase 3 — si el proyecto crece a multi-usuario o
+  requiere auth, hay que re-evaluar contra un Tech Spec real (el flag `assumed_default` señala esto
+  explícitamente para auditoría futura, mismo patrón de riesgo documentado en D-009).
+
+**Mitigation:** cuando `inventario-juegos` pase por `la-herreria` Fase 3 (si el alcance crece más allá
+del MVP de un solo cliente), re-validar la decisión de BaaS contra el Tech Spec formal; el flag
+`assumed_default = true` en `TECH-SPEC-inventario-juegos.md` deja la asunción trazable para esa
+revisión, siguiendo la política de auditoría de D-009.
+
+**Fuente:** `.claude/PRPs/TECH-SPEC-inventario-juegos.md` sección "BaaS Decision". Emparenta con
+[memory:lessons#L-001] (RLS por user_id/degradado como default en tablas de datos) y
+[memory:decisions#D-009] (Supabase default de `add-login`, mismo patrón `assumed_default`).
+
+**Cita:** `[memory:decisions#D-039]`
+
+<!-- D-040 onwards: populated as architectural decisions emerge -->

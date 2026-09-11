@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "phase": "2 — Blueprint aprobado (pre-build). Todas las features en 'pending'; /build activa F1-01.",
+  "phase": "Fase 1 (Cimientos y datos) implementada y verificada localmente (R7 verde) por el-evaluador en feat/f1-cimientos-datos: F1-01 active (ancla del PR), F1-02/F1-03 queued — pendientes de abrir PR y correr CI antes de pasar a passing (AP8). Fase 2 (Brand DNA + UI) pendiente, arranca en F2-01.",
   "project": "Inventario de Videojuegos",
   "blueprint": ".claude/PRPs/BLUEPRINT-inventario-juegos.md",
   "notes": "Generado desde el repo de contexto (el repo de producto aun no existe). Reglas del arne activas: R1 WIP=1, R2 commits convencionales, R3 rama por feature, R7 three-layer, R10 Brand DNA, R14 confirmacion tipada en destructivas, AP8 passing solo con CI verde. Sin codigo de implementacion: 'verification' son los comandos que deberan existir y pasar; ninguno corre todavia.",
@@ -10,42 +10,66 @@
       "phase": 1,
       "behavior": "El proyecto arranca en local desde el template Forge y cumple el Bootstrap Contract (R11): feature_list.json valido con >=3 features y verification, skills.md generado, >=1 test corriendo.",
       "verification": "make preflight",
-      "state": "pending",
-      "branch": "chore/bootstrap-contract",
+      "state": "active",
+      "branch": "feat/f1-cimientos-datos",
       "acceptance": [
         "make setup exit 0",
         "make preflight exit 0",
         ">=1 test passing"
       ],
-      "blueprint_ref": "F1 / Subfase 1.1"
+      "blueprint_ref": "F1 / Subfase 1.1",
+      "evidence": {
+        "evaluated_by": "el-evaluador",
+        "date": "2026-09-11",
+        "commit": "pending (uncommitted working tree at eval time, base 996b4248486a2cb5837cf130aa38aad16b3844e7 — humano commitea tras revisión)",
+        "verification_command": "bash scripts/preflight.sh (equivalente a 'make preflight' — 'make' no disponible en este entorno)",
+        "exit_code": 0,
+        "notes": "5 pass / 1 skip (Brand DNA diferido a F2-01 via brand/.no-brand-yet). Layer 1 (npx tsc --noEmit) exit 0. Layer 2 (npm run test) exit 0, 14/14 tests. Feature ancla del PR — queda 'active' (no 'passing') hasta CI verde: AP8."
+      }
     },
     {
       "id": "F1-02",
       "phase": 1,
       "behavior": "Existe la entidad game con su migracion; la migracion aplica y revierte limpio en una DB de prueba y deja RLS activo en la tabla (L-001).",
       "verification": "npm run test -- game-migration",
-      "state": "pending",
-      "branch": "feature/game-schema",
+      "state": "queued",
+      "branch": "feat/f1-cimientos-datos",
       "acceptance": [
         "La migracion up crea la tabla game con los campos de BLUEPRINT §3",
         "La migracion down revierte sin residuos",
         "RLS habilitado en game con politica declarada"
       ],
-      "blueprint_ref": "F1 / Subfase 1.2 (tareas 1.2.1, 1.2.2)"
+      "blueprint_ref": "F1 / Subfase 1.2 (tareas 1.2.1, 1.2.2)",
+      "evidence": {
+        "evaluated_by": "el-evaluador",
+        "date": "2026-09-11",
+        "commit": "pending (uncommitted working tree at eval time, base 996b4248486a2cb5837cf130aa38aad16b3844e7 — humano commitea tras revisión)",
+        "verification_command": "npm run test -- game-migration",
+        "exit_code": 0,
+        "notes": "6/6 tests contra Supabase local real (Docker), incluye RLS deny-all para anon (select vacío, insert rechazado) y constraints a nivel DB (platform/quantity/rating). Layer 3 (n/a por BLUEPRINT — DB migration, no UI) verificado manualmente: supabase db reset (up) + rollback vía psql (down, \\d public.game confirma tabla ausente) + reset de nuevo. Migración: supabase/migrations/20260911061546_add_game.sql; rollback fuera de supabase/migrations/ para que el CLI no lo aplique como migración adicional. R7 local verde — 'queued' (no 'passing') porque WIP=1/R1 exige una sola feature 'active' (F1-01 es la ancla); pending de ci_run.conclusion==\"success\" para pasar a 'passing' (AP8)."
+      }
     },
     {
       "id": "F1-03",
       "phase": 1,
       "behavior": "La capa de acceso a datos expone crear / listar / obtener / actualizar / eliminar sobre game, con validacion por whitelist de campos (L-003) y una guarda de confirmacion tipada para el borrado (R14).",
       "verification": "npm run test -- games-repository",
-      "state": "pending",
-      "branch": "feature/games-repository",
+      "state": "queued",
+      "branch": "feat/f1-cimientos-datos",
       "acceptance": [
         "Alta con payload valido persiste; con campo fuera de whitelist rechaza",
         "quantity < 1 y rating fuera de rango se rechazan",
         "El borrado no se ejecuta sin token de confirmacion explicito"
       ],
-      "blueprint_ref": "F1 / Subfase 1.2 (tarea 1.2.3)"
+      "blueprint_ref": "F1 / Subfase 1.2 (tarea 1.2.3)",
+      "evidence": {
+        "evaluated_by": "el-evaluador",
+        "date": "2026-09-11",
+        "commit": "pending (uncommitted working tree at eval time, base 996b4248486a2cb5837cf130aa38aad16b3844e7 — humano commitea tras revisión)",
+        "verification_command": "npm run test -- games-repository",
+        "exit_code": 0,
+        "notes": "8/8 tests contra la misma DB local. Cubre CRUD completo, rechazo de mass-assignment (.strict() en gameCreateSchema/gameUpdateSchema, L-003), rechazo de quantity/rating fuera de rango, y R14 (gameDeleteSchema exige confirmation === 'ELIMINAR' vía z.literal; sin token o token incorrecto lanza ZodError antes de tocar la DB). src/features/games/{schema.ts,repository.ts}, src/shared/lib/supabase/service-client.ts (service role, server-only). R7 local verde — 'queued' (no 'passing') porque WIP=1/R1 exige una sola feature 'active' (F1-01 es la ancla); pending de ci_run.conclusion==\"success\" para pasar a 'passing' (AP8)."
+      }
     },
     {
       "id": "F2-01",
