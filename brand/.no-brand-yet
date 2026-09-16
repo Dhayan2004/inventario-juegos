@@ -1,0 +1,4 @@
+Fase 1 (Cimientos y datos) precede a Fase 2, donde `add-ui-kit` genera brand.json + voice.json
+(preset Tech Utility, BLUEPRINT §0). Ese trabajo ya existe en la rama `chore/brand-dna` (F2-01,
+PR cerrado sin merge) y se retoma quando Fase 2 arranque — deliberadamente fuera de alcance de
+esta sesión (Fase 1 = "sin UI"). Borrar este flag al iniciar F2-01.
