@@ -81,6 +81,35 @@ describe("games-repository", () => {
     expect(updated.rating).toBe(9);
   });
 
+  it("una actualización parcial no reescribe campos omitidos con defaults de creación", async () => {
+    const game = await createGame({
+      title: `${TEST_TITLE_PREFIX}partial-update`,
+      platform: "PC",
+      status: "completed",
+      quantity: 3,
+    });
+    expect(game.status).toBe("completed");
+    expect(game.quantity).toBe(3);
+
+    const updated = await updateGame(game.id, {
+      title: `${TEST_TITLE_PREFIX}partial-update-renamed`,
+    });
+
+    expect(updated.title).toBe(`${TEST_TITLE_PREFIX}partial-update-renamed`);
+    expect(updated.status).toBe("completed");
+    expect(updated.quantity).toBe(3);
+  });
+
+  it("rechaza un id inválido en getGame antes de tocar la DB", async () => {
+    await expect(getGame("not-a-uuid")).rejects.toThrow(ZodError);
+  });
+
+  it("rechaza un id inválido en updateGame antes de tocar la DB", async () => {
+    await expect(
+      updateGame("not-a-uuid", { title: `${TEST_TITLE_PREFIX}bad-id` })
+    ).rejects.toThrow(ZodError);
+  });
+
   it("R14 — deleteGame sin el token de confirmación no ejecuta el borrado", async () => {
     const game = await createGame({ title: `${TEST_TITLE_PREFIX}guarded`, platform: "PC" });
 

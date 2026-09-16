@@ -32,26 +32,43 @@ const isoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "purchase_date debe ser YYYY-MM-DD");
 
+/**
+ * Campos base sin `.default()` — compartidos entre create y update. Los
+ * defaults viven SOLO en `gameCreateSchema` (abajo). Si `gameUpdateSchema`
+ * derivara de `gameCreateSchema.partial()`, un campo omitido en un PATCH
+ * podría recibir el default de creación en vez de quedar intacto (el
+ * comportamiento de Zod ante `.optional()` + `.default()` combinados con
+ * `.partial()` no es estable entre versiones) — separar los schemas evita
+ * depender de ese detalle de implementación.
+ */
+const gameBaseFields = {
+  title: z.string().trim().min(1, "title es requerido"),
+  platform: z.enum(GAME_PLATFORMS),
+  genre: z.string().trim().min(1).optional(),
+  status: z.enum(GAME_STATUSES),
+  format: z.enum(GAME_FORMATS).optional(),
+  quantity: z.number().int().min(1),
+  purchase_price: z.number().min(0).optional(),
+  purchase_date: isoDate.optional(),
+  rating: z.number().int().min(1).max(10).optional(),
+  notes: z.string().trim().min(1).optional(),
+};
+
 export const gameCreateSchema = z
   .object({
-    title: z.string().trim().min(1, "title es requerido"),
-    platform: z.enum(GAME_PLATFORMS),
-    genre: z.string().trim().min(1).optional(),
-    status: z.enum(GAME_STATUSES).default("owned"),
-    format: z.enum(GAME_FORMATS).optional(),
-    quantity: z.number().int().min(1).default(1),
-    purchase_price: z.number().min(0).optional(),
-    purchase_date: isoDate.optional(),
-    rating: z.number().int().min(1).max(10).optional(),
-    notes: z.string().trim().min(1).optional(),
+    ...gameBaseFields,
+    status: gameBaseFields.status.default("owned"),
+    quantity: gameBaseFields.quantity.default(1),
   })
   .strict();
 
-export const gameUpdateSchema = gameCreateSchema.partial().strict();
+export const gameUpdateSchema = z.object(gameBaseFields).partial().strict();
+
+export const gameIdSchema = z.string().uuid();
 
 export const gameDeleteSchema = z
   .object({
-    id: z.string().uuid(),
+    id: gameIdSchema,
     confirmation: z.literal(DELETE_CONFIRMATION_TOKEN),
   })
   .strict();

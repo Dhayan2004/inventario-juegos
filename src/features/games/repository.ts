@@ -2,6 +2,7 @@ import { createServiceClient } from "@/shared/lib/supabase/service-client";
 import {
   gameCreateSchema,
   gameDeleteSchema,
+  gameIdSchema,
   gameUpdateSchema,
   type Game,
 } from "./schema";
@@ -42,12 +43,13 @@ export async function listGames(): Promise<Game[]> {
 }
 
 export async function getGame(id: string): Promise<Game | null> {
+  const validId = gameIdSchema.parse(id);
   const client = createServiceClient();
 
   const { data, error } = await client
     .from("game")
     .select("*")
-    .eq("id", id)
+    .eq("id", validId)
     .maybeSingle();
 
   if (error) throw new Error(`getGame: ${error.message}`);
@@ -55,13 +57,14 @@ export async function getGame(id: string): Promise<Game | null> {
 }
 
 export async function updateGame(id: string, input: unknown): Promise<Game> {
+  const validId = gameIdSchema.parse(id);
   const payload = gameUpdateSchema.parse(input);
   const client = createServiceClient();
 
   const { data, error } = await client
     .from("game")
     .update(payload)
-    .eq("id", id)
+    .eq("id", validId)
     .select()
     .single();
 
