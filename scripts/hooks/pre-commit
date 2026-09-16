@@ -159,13 +159,23 @@ fi
 # tener ci_run.conclusion=="success". Degradación segura: sin ci.yml → gobierna solo R7 local.
 if [[ -f "$REPO_ROOT/.github/workflows/ci.yml" && -f "$FEATURE_LIST" ]] && command -v node >/dev/null 2>&1; then
   if git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -q '^feature_list.json$'; then
-    STAGED_FL=$(git show ":feature_list.json" 2>/dev/null || echo '')
-    HEAD_FL=$(git show "HEAD:feature_list.json" 2>/dev/null || echo '{"features":[]}')
+    # Contenido por archivo temporal, no por argv: un feature_list.json de tamaño normal
+    # (staged + HEAD combinados) puede superar el límite de línea de comandos de Windows
+    # (CreateProcess ~32K, con el overhead extra de re-escapar comillas de JSON) y tirar
+    # "Argument list too long" aunque el JSON sea válido — visto en la práctica al crecer
+    # el archivo. Archivos + fs.readFileSync no tiene ese límite en ningún SO.
+    AP8_TMP_DIR=$(mktemp -d 2>/dev/null || echo "$REPO_ROOT/.git/.ap8-tmp")
+    mkdir -p "$AP8_TMP_DIR"
+    STAGED_FL_FILE="$AP8_TMP_DIR/staged.json"
+    HEAD_FL_FILE="$AP8_TMP_DIR/head.json"
+    git show ":feature_list.json" >"$STAGED_FL_FILE" 2>/dev/null || : >"$STAGED_FL_FILE"
+    git show "HEAD:feature_list.json" >"$HEAD_FL_FILE" 2>/dev/null || echo '{"features":[]}' >"$HEAD_FL_FILE"
     AP8_RESULT=$(node -e '
+      const fs = require("fs");
       let staged;
-      try { staged = JSON.parse(process.argv[1] || "{}"); }
+      try { staged = JSON.parse(fs.readFileSync(process.argv[1], "utf8") || "{}"); }
       catch { process.stdout.write("MALFORMED"); process.exit(0); }   // fail-closed: bad JSON no pasa
-      let head; try { head = JSON.parse(process.argv[2] || "{}"); } catch { head = { features: [] }; }
+      let head; try { head = JSON.parse(fs.readFileSync(process.argv[2], "utf8") || "{}"); } catch { head = { features: [] }; }
       const wasPassing = {};
       for (const f of (head.features || [])) if (f.state === "passing") wasPassing[f.id] = true;
       const bad = [];
@@ -175,7 +185,8 @@ if [[ -f "$REPO_ROOT/.github/workflows/ci.yml" && -f "$FEATURE_LIST" ]] && comma
         }
       }
       if (bad.length) process.stdout.write("BAD:" + bad.join(", "));
-    ' "$STAGED_FL" "$HEAD_FL" 2>/dev/null || echo "NODE_ERR")
+    ' "$STAGED_FL_FILE" "$HEAD_FL_FILE" 2>/dev/null || echo "NODE_ERR")
+    rm -rf "$AP8_TMP_DIR"
     if [[ "$AP8_RESULT" == "MALFORMED" || "$AP8_RESULT" == "NODE_ERR" ]]; then
       echo "❌ AP8/R1 (fail-closed): feature_list.json staged no parsea como JSON. Arreglalo antes de commitear." >&2
       echo "Source: CONSTRAINTS.md AP8 (docs/07 Punto 4)." >&2
